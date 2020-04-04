@@ -1,0 +1,28 @@
+.idea
+.DS_store
+.DS_Store
+.env
+vendor
+symfony.lock
+var
+certs/
+###> symfony/framework-bundle ###
+/.env.local
+/.env.local.php
+/.env.*.local
+/config/secrets/prod/prod.decrypt.private.php
+/public/bundles/
+/var/
+/vendor/
+###< symfony/framework-bundle ###
+
+###> symfony/phpunit-bridge ###
+.phpunit
+.phpunit.result.cache
+/phpunit.xml
+###< symfony/phpunit-bridge ###
+
+certs/
+phpdocker/nginx/site.conf
+node_modules/
+.serverless
