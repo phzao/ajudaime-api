@@ -39,6 +39,7 @@ Open Routes
 GET - http://localhost:8888/public/donations/{user_id}/user  -> Show donations by user.
 GET - http://localhost:8888/public/donations/{status}/status -> Show donations by status.
 GET - http://localhost:8888/public/needs/{user_id}/user -> Show needs by user.
+GET - http://localhost:8888/public/needs -> List all needs not canceled.
 ````
 
 Private Routes
@@ -48,8 +49,9 @@ POST - http://localhost:8888/api/v1/needs
 PUT - http://localhost:8888/api/v1/needs/{uuid}
 DELETE - http://localhost:8888/api/v1/needs/{uuid}
 
-PUT - http://localhost:8888/api/v1/donations/{uuid}/done
-PUT - http://localhost:8888/api/v1/donations/{uuid}/cancel
+PUT - http://localhost:8888/api/v1/donations/{uuid}/done -> did by who help
+PUT - http://localhost:8888/api/v1/donations/{uuid}/cancel -> did by who help
+PUT - http://localhost:8888/api/v1/donations/{uuid}/confirm -> did by who need help
 POST - http://localhost:8888/api/v1/donations
 
 POST - http://localhost:8888/api/v1/talks/{donation_id}

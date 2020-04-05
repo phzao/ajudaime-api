@@ -64,9 +64,8 @@ final class UserService implements UserServiceInterface
     public function getUserByEmailAnyway(array $data): ?array
     {
 
-        $query = $this->elasticQueries->getQueryToSingleSearch($this->userIndex, $data["email"], "email");
+        $query = $this->elasticQueries->getQueryExactBy($this->userIndex, "email", $data["email"]);
 
-        $query["size"] = 1;
         $user = $this->repository->getOneBy($query);
 
         if (!empty($user)) {

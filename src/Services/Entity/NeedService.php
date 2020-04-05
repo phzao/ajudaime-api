@@ -85,34 +85,6 @@ final class NeedService implements NeedServiceInterface
         }
     }
 
-    public function ifThisNeedListExistAndIsOpenMustFail(string $user_id, array $data)
-    {
-        if (empty($data["needsList"])) {
-            $msg = ErrorMessage::getArrayMessageToJson(["needsList"=>"Lista de necessidades é obrigatória!"]);
-
-            throw new UnprocessableEntityHttpException($msg);
-        }
-
-        $match = [
-            "user.id" => $user_id,
-            "needsList" => $data["needsList"],
-        ];
-
-        $matchNot = [
-            "status" => GeneralTypes::STATUS_DISABLE
-        ];
-
-        $query = $this->elasticQueries->getBoolMustMatchMustNotBy($this->needIndex, $match, $matchNot);
-
-        $query["size"] = 1;
-
-        $res = $this->repository->search($query);
-
-        if (!empty($res["results"])) {
-            throw new BadRequestHttpException("Já existe uma lista identica em aberto!");
-        }
-    }
-
     public function getNeedByIdOrFail(array $data): array
     {
         if (empty($data["need"])) {
@@ -136,9 +108,26 @@ final class NeedService implements NeedServiceInterface
 
     public function update(array $data, array $user): void
     {
+        $needSaved = $this->getOneByIdUserIdAndEnable($data["id"], $user["id"]);
+
+        $this->need->setAttributes($needSaved);
+
+        $data["user"] = $user;
+
+        $this->need->setAttributes($data);
+
+        $this->validation->entityIsValidOrFail($this->need);
+
+        $needUpdated = $this->need->getFullDataToUpdateIndex();
+
+        $this->repository->update($needUpdated);
+    }
+
+    public function getOneByIdUserIdAndEnable(string $need_id, string $user_id): array
+    {
         $match = [
-            "user.id" => $user["id"],
-            "id" => $data["id"],
+            "user.id" => $user_id,
+            "id" => $need_id,
             "status" => GeneralTypes::STATUS_ENABLE
         ];
 
@@ -152,19 +141,7 @@ final class NeedService implements NeedServiceInterface
             throw new NotFoundHttpException("Lista não localizada");
         }
 
-        $needSaved = $res["results"][0];
-
-        $this->need->setAttributes($needSaved);
-
-        $data["user"] = $user;
-
-        $this->need->setAttributes($data);
-
-        $this->validation->entityIsValidOrFail($this->need);
-
-        $needUpdated = $this->need->getFullDataToUpdateIndex();
-
-        $this->repository->update($needUpdated);
+        return $res["results"][0];
     }
 
     public function remove(string $need_id, string $user_id): void
@@ -193,29 +170,31 @@ final class NeedService implements NeedServiceInterface
         $this->repository->delete($match);
     }
 
-    public function disableNeedById(string $need_id): void
+    public function loadNeedToDisable(string $need_id, $newData = []): array
     {
-        $match = [
-            "id" => $need_id,
-            "status" => GeneralTypes::STATUS_ENABLE
-        ];
-
-        $query = $this->elasticQueries->getBoolMustMatchBy($this->needIndex, $match);
-
-        $query["size"] = 1;
-
-        $res = $this->repository->search($query);
-
-        if (empty($res["results"])) {
-            throw new NotFoundHttpException("Lista não localizada");
-        }
-
-        $needSaved = $res["results"][0];
+        $needSaved = $this->getOneByIdAndEnableOrFail($need_id);
 
         $this->need->setAttributes($needSaved);
+
+        if (!empty($newData)) {
+            $this->need->setAttributes($newData);
+        }
+
         $this->need->disable();
 
-        $needUpdated = $this->need->getFullDataToUpdateIndex();
+        return $this->need->getFullDataToUpdateIndex();
+    }
+
+    public function disableNeedById(string $need_id): void
+    {
+        $needUpdated = $this->loadNeedToDisable($need_id);
+
+        $this->repository->update($needUpdated);
+    }
+
+    public function setNeedDone(string $need_id, array $donation): void
+    {
+        $needUpdated = $this->loadNeedToDisable($need_id, ["donation" => $donation]);
 
         $this->repository->update($needUpdated);
     }
@@ -234,5 +213,50 @@ final class NeedService implements NeedServiceInterface
         }
 
         return [];
+    }
+
+    public function updateAnyway(array $need)
+    {
+        $this->need->setAttributes($need);
+        $needUpdated = $this->need->getFullDataToUpdateIndex();
+
+        $this->repository->update($needUpdated);
+    }
+
+    public function getOneByIdAndEnableOrFail(string $need_id): array
+    {
+        $match = [
+            "id" => $need_id,
+            "status" => GeneralTypes::STATUS_ENABLE
+        ];
+
+        $query = $this->elasticQueries->getBoolMustMatchBy($this->needIndex, $match);
+
+        $query["size"] = 1;
+
+        $res = $this->repository->search($query);
+
+        if (empty($res["results"])) {
+            throw new NotFoundHttpException("Lista não localizada");
+        }
+
+        return $res["results"][0];
+    }
+
+    public function getAllNeedsNotCanceled(): array
+    {
+        $match = [
+            "status" => GeneralTypes::STATUS_ENABLE
+        ];
+
+        $query = $this->elasticQueries->getBoolMustMatchBy($this->needIndex, $match);
+
+        $res = $this->repository->search($query);
+
+        if (empty($res["results"])) {
+            throw new NotFoundHttpException("Lista não localizada");
+        }
+
+        return $res["results"];
     }
 }

@@ -20,7 +20,13 @@ interface DonationServiceInterface
 
     public function doneDonation(string $user_id, string $donation_id): array;
 
+    public function needConfirmation(string $user_id, string $donation_id): array;
+
     public function getDonationsByUser(string $user_id): array;
 
     public function getDonationsByStatus(string $status): array;
+
+    public function getDonationStatusIdCreated(): array;
+
+    public function getOneByIdUserIdProcessingOrFail(string $user_id, string $donation_id): array;
 }

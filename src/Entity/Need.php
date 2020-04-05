@@ -27,6 +27,8 @@ class Need implements NeedInterface
 
     protected $user;
 
+    protected $donation;
+
     /**
      * @Assert\NotBlank(message="Uma lista de necessidades é obrigatória!")
      * @Assert\Length(
@@ -62,8 +64,9 @@ class Need implements NeedInterface
         "id",
         "user",
         "needsList",
+        "donation",
         "message",
-        "created_at",
+        "created_at"
     ];
 
     public function getId(): ?string
@@ -102,6 +105,7 @@ class Need implements NeedInterface
             "id" => $this->id,
             "user" => $this->user,
             "status" => $this->status,
+            "donation" => $this->donation,
             "message" => $this->message,
             "needsList" => $this->needsList,
             "created_at" => $this->created_at,
@@ -136,7 +140,14 @@ class Need implements NeedInterface
                                 "email" => ["type" => "keyword"],
                                 "name" => ["type" => "text"],
                                 "message" => ["type" => "text", "null_value" => "NULL"],
-                                "localization" => ["type" => "geo_point"],
+                                "localization" => ["type" => "geo_point"]
+                            ]
+                        ],
+                        "donation" => [
+                            "properties" => [
+                                "id" => ["type" => "keyword"],
+                                "status" => ["type" => "integer", "null_value" => "NULL"],
+                                "created_at" => ["type" => "date"]
                             ]
                         ],
                         "needsList" => ["type" => "text"],

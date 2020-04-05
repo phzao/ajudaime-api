@@ -7,6 +7,21 @@ namespace App\Utils\ElasticSearch;
  */
 class ElasticSearchQueries implements ElasticSearchQueriesInterface
 {
+    public function getQueryExactBy(string $index,
+                                    string $column,
+                                    string $value): array
+    {
+        $body = $this->getBodyData($index);
+
+        $body["body"] = [
+            "query" => [
+                "match_phrase_prefix" => [ $column => $value]
+            ]
+        ];
+
+        return $body;
+    }
+
     public function getQueryToSingleSearch(string $index,
                                            string $query,
                                            string $field): array

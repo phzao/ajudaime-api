@@ -37,7 +37,7 @@ class TalkController extends APIController
 
             $talk = $talkService->register($data);
 
-            return $this->respondSuccess($talk);
+            return $this->respondCreated($talk);
 
         } catch (UnauthorizedHttpException $exception) {
 

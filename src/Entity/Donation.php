@@ -157,4 +157,18 @@ class Donation implements DonationInterface
         $this->canceled_at = new \DateTime();
         $this->status = GeneralTypes::STATUS_CANCEL;
     }
+
+    public function confirm(): void
+    {
+        $this->need_confirmed_at = new \DateTime();
+    }
+
+    public function getResumeToNeed(): array
+    {
+        return [
+            "id" => $this->id,
+            "status" => $this->status,
+            "created_at" => $this->created_at
+        ];
+    }
 }

@@ -7,6 +7,8 @@ namespace App\Utils\ElasticSearch;
  */
 interface ElasticSearchQueriesInterface
 {
+    public function getQueryExactBy(string $index, string $column, string $value): array;
+
     public function getQueryToSingleSearch(string $index, string $query, string $field): array;
 
     public function getMatchSearch(string $index, array $params): array;

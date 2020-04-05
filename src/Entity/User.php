@@ -51,7 +51,6 @@ class User implements UsuarioInterface, ModelInterface, SimpleTimeInterface
 
     /**
      * @Assert\Length(
-     *      min = 10,
      *      max = 20,
      *      minMessage = "Telefone pode ter no máximo {{ limit }} caracteres",
      *      maxMessage = "Telefone pode ter no mínimo {{ limit }} caracteres"
@@ -62,7 +61,6 @@ class User implements UsuarioInterface, ModelInterface, SimpleTimeInterface
 
     /**
      * @Assert\Length(
-     *      min = 10,
      *      max = 20,
      *      minMessage = "Telefone pode ter no máximo {{ limit }} caracteres! Formato (xx) xxxxx-xxxx",
      *      maxMessage = "Telefone pode ter no mínimo {{ limit }} caracteres! Formato (xx) xxxxx-xxxx"
@@ -73,7 +71,6 @@ class User implements UsuarioInterface, ModelInterface, SimpleTimeInterface
 
     /**
      * @Assert\Length(
-     *      min = 10,
      *      max = 500,
      *      minMessage = "Mensagem pode ter no máximo {{ limit }} caracteres",
      *      maxMessage = "Mensagem pode ter no mínimo {{ limit }} caracteres"
@@ -88,6 +85,8 @@ class User implements UsuarioInterface, ModelInterface, SimpleTimeInterface
      */
     protected $status;
 
+    protected $localization;
+
     /**
      * @Assert\Length(
      *      max = 70,
@@ -95,6 +94,8 @@ class User implements UsuarioInterface, ModelInterface, SimpleTimeInterface
      * )
      */
     protected $name;
+
+    protected $isConfirmedLocalization = false;
 
     /**
      * @ORM\Column(type="datetime")
@@ -109,8 +110,9 @@ class User implements UsuarioInterface, ModelInterface, SimpleTimeInterface
         "status",
         "whatsapp",
         "message",
-        "location",
+        "localization",
         "apiToken",
+        "isConfirmedLocalization",
         "created_at",
         "deleted_at"
     ];
@@ -120,8 +122,6 @@ class User implements UsuarioInterface, ModelInterface, SimpleTimeInterface
     protected $deleted_at = GeneralTypes::NULL_VALUE;
 
     protected $updated_at = GeneralTypes::NULL_VALUE;
-
-    protected $location;
 
     /**
      * @throws \Exception
@@ -195,8 +195,9 @@ class User implements UsuarioInterface, ModelInterface, SimpleTimeInterface
             "name" => $this->name,
             "phone" => $this->phone,
             "whatsapp" => $this->whatsapp,
+            "isConfirmedLocalization" => $this->isConfirmedLocalization,
             "message" => $this->message,
-            "location" => $this->location,
+            "localization" => $this->localization,
             "status" => $this->status,
             "status_description" => GeneralTypes::getDefaultDescription($this->status),
             "created_at" => $this->getDateTimeStringFrom('created_at'),
@@ -218,7 +219,8 @@ class User implements UsuarioInterface, ModelInterface, SimpleTimeInterface
             "email" => $this->email,
             "name" => $this->name,
             "status" => $this->status,
-            "location" => $this->location,
+            "localization" => $this->localization,
+            "isConfirmedLocalization" => $this->isConfirmedLocalization,
             "phone" => $this->phone,
             "whatsapp" => $this->whatsapp,
             "message" => $this->message,
@@ -297,6 +299,7 @@ class User implements UsuarioInterface, ModelInterface, SimpleTimeInterface
                         "status" => ["type" => "text"],
                         "email" => ["type" => "keyword"],
                         "name" => ["type" => "text"],
+                        "isConfirmedLocalization" => ["type" => "boolean"],
                         "message" => ["type" => "text", "null_value" => "NULL"],
                         "localization" => ["type" => "geo_point"],
                         "api_token" => [
@@ -355,7 +358,7 @@ class User implements UsuarioInterface, ModelInterface, SimpleTimeInterface
             "name" => $this->name,
             "whatsapp" => $this->whatsapp,
             "message" => $this->message,
-            "location" => $this->location
+            "localization" => $this->localization
         ];
     }
 }

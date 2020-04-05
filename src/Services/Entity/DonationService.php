@@ -9,7 +9,6 @@ use App\Services\Validation\ValidateModelInterface;
 use App\Utils\ElasticSearch\ElasticSearchQueriesInterface;
 use App\Utils\Enums\GeneralTypes;
 use App\Utils\HandleErrors\ErrorMessage;
-use http\Exception\InvalidArgumentException;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
@@ -25,6 +24,8 @@ final class DonationService implements DonationServiceInterface
     private $donationIndex;
 
     private $validation;
+
+    private $donationToNeed;
 
     public function __construct(ElasticSearchRepositoryInterface $elasticSearchRepository,
                                 ElasticSearchQueriesInterface $elasticSearchQueries,
@@ -72,6 +73,8 @@ final class DonationService implements DonationServiceInterface
         $needUpdated = $this->donation->getFullDataToUpdateIndex();
 
         $this->repository->update($needUpdated);
+
+        $this->donationToNeed = $this->donation->getResumeToNeed();
 
         return $this->donation->getOriginalData();
     }
@@ -138,13 +141,12 @@ final class DonationService implements DonationServiceInterface
 
         return $transaction[0]["id"];
     }
-    
-    public function doneDonation(string $user_id, string $donation_id): array
+
+    public function needConfirmation(string $user_id, string $donation_id): array
     {
         $match = [
-            "user.id" => $user_id,
-            "id" => $donation_id,
-            "status" => GeneralTypes::STATUS_PROCESSING
+            "need.id" => $user_id,
+            "id" => $donation_id
         ];
 
         $query = $this->elasticQueries->getBoolMustMatchBy($this->donationIndex, $match);
@@ -158,12 +160,13 @@ final class DonationService implements DonationServiceInterface
 
         $donationSaved = $res["results"][0];
         $this->donation->setAttributes($donationSaved);
-        $this->donation->done();
+        $this->donation->confirm();
+        $this->donationToNeed = $this->donation->getResumeToNeed();
 
         return $donationSaved;
     }
 
-    public function cancelDonation(string $user_id, string $donation_id): array
+    public function getOneByIdUserIdProcessingOrFail(string $user_id, string $donation_id): array
     {
         $match = [
             "user.id" => $user_id,
@@ -180,7 +183,23 @@ final class DonationService implements DonationServiceInterface
             throw new NotFoundHttpException("Doação não encontrada!");
         }
 
-        $donationSaved = $res["results"][0];
+        return $res["results"][0];
+    }
+
+    public function doneDonation(string $user_id, string $donation_id): array
+    {
+        $donationSaved = $this->getOneByIdUserIdProcessingOrFail($user_id, $donation_id);
+
+        $this->donation->setAttributes($donationSaved);
+        $this->donation->done();
+        $this->donationToNeed = $this->donation->getResumeToNeed();
+
+        return $donationSaved;
+    }
+
+    public function cancelDonation(string $user_id, string $donation_id): array
+    {
+        $donationSaved = $this->getOneByIdUserIdProcessingOrFail($user_id, $donation_id);
         $this->donation->setAttributes($donationSaved);
         $this->donation->cancel();
 
@@ -219,5 +238,10 @@ final class DonationService implements DonationServiceInterface
         }
 
         return [];
+    }
+
+    public function getDonationStatusIdCreated(): array
+    {
+        return $this->donationToNeed;
     }
 }

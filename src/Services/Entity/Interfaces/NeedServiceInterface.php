@@ -8,8 +8,6 @@ interface NeedServiceInterface
 
     public function thisNeedGoesBeyondTheOpensLimitOfOrFail(int $allowed_number, string $user_id);
 
-    public function ifThisNeedListExistAndIsOpenMustFail(string $user_id, array $data);
-
     public function register(array $data): ?array;
 
     public function update(array $data, array $user): void;
@@ -20,5 +18,15 @@ interface NeedServiceInterface
 
     public function disableNeedById(string $need_id): void;
 
+    public function setNeedDone(string $need_id, array $donation): void;
+
+    public function loadNeedToDisable(string $need_id, $newData = []): array;
+
     public function getNeedsListByUser(string $user_id): array;
+
+    public function updateAnyway(array $need);
+
+    public function getOneByIdAndEnableOrFail(string $need_id): array;
+
+    public function getAllNeedsNotCanceled(): array;
 }

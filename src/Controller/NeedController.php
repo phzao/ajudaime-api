@@ -22,13 +22,12 @@ class NeedController extends APIController
             $data = $request->request->all();
             $user = $this->getUser();
 
-            $needService->ifThisNeedListExistAndIsOpenMustFail($user->getId(), $data);
             $needService->thisNeedGoesBeyondTheOpensLimitOfOrFail(3, $user->getId());
 
             $data["user"] = $user->getDataResume();
             $needs = $needService->register($data);
 
-            return $this->respondSuccess($needs);
+            return $this->respondCreated($needs);
 
         } catch (UnauthorizedHttpException $exception) {
 
@@ -95,6 +94,24 @@ class NeedController extends APIController
     {
         try {
             $list = $needService->getNeedsListByUser($user_id);
+
+            return $this->respondSuccess($list);
+        } catch (NotFoundHttpException $exception) {
+
+            return $this->respondNotFoundError($exception->getMessage());
+        } catch (\Exception $exception) {
+
+            return $this->respondBadRequestError($exception->getMessage());
+        }
+    }
+
+    /**
+     * @Route("/public/needs", methods={"GET"})
+     */
+    public function listNotCanceled(NeedServiceInterface $needService)
+    {
+        try {
+            $list = $needService->getAllNeedsNotCanceled();
 
             return $this->respondSuccess($list);
         } catch (NotFoundHttpException $exception) {

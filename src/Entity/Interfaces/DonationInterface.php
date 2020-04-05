@@ -7,4 +7,8 @@ interface DonationInterface extends ModelInterface
     public function done(): void;
 
     public function cancel(): void;
+
+    public function confirm(): void;
+
+    public function getResumeToNeed(): array;
 }

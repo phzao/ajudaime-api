@@ -28,11 +28,16 @@ class DonationController extends APIController
             $donationService->thisDonationGoesBeyondTheProcessingLimitOfOrFail(3, $user->getId());
 
             $data["user"] = $user->getDataResume();
-            $data["need"] = $needService->getNeedByIdOrFail($data);
+            $need = $needService->getNeedByIdOrFail($data);
+            $data["need"] = $need;
 
-            $transaction = $donationService->register($data);
+            $donation = $donationService->register($data);
 
-            return $this->respondSuccess($transaction);
+            $need["donation"] = $donationService->getDonationStatusIdCreated();
+
+            $needService->updateAnyway($need);
+
+            return $this->respondCreated($donation);
 
         } catch (UnauthorizedHttpException $exception) {
 
@@ -51,13 +56,11 @@ class DonationController extends APIController
      * @throws \Exception
      */
     public function cancel($uuid,
-                           DonationServiceInterface $donationService,
-                           NeedServiceInterface $needService)
+                           DonationServiceInterface $donationService)
     {
         try {
             $user = $this->getUser();
-            $donation = $donationService->cancelDonation($user->getId(), $uuid);
-            $needService->disableNeedById($donation["need"]["id"]);
+            $donationService->cancelDonation($user->getId(), $uuid);
 
             return $this->respondUpdatedResource();
 
@@ -85,7 +88,32 @@ class DonationController extends APIController
             $user = $this->getUser();
             $donation = $donationService->doneDonation($user->getId(), $uuid);
 
-            $needService->disableNeedById($donation["need"]["id"]);
+            $needService->setNeedDone($donation["need"]["id"],
+                                      $donationService->getDonationStatusIdCreated());
+
+            return $this->respondUpdatedResource();
+
+        } catch (UnauthorizedHttpException $exception) {
+
+            return $this->respondForbiddenFail($exception->getMessage());
+        } catch (UnprocessableEntityHttpException $exception) {
+
+            return $this->respondValidationFail($exception->getMessage());
+        } catch (\Exception $exception) {
+
+            return $this->respondBadRequestError($exception->getMessage());
+        }
+    }
+
+    /**
+     * @Route("/api/v1/donations/{uuid}/confirm", methods={"PUT"})
+     * @throws \Exception
+     */
+    public function confirm($uuid, DonationServiceInterface $donationService)
+    {
+        try {
+            $user = $this->getUser();
+            $donationService->needConfirmation($user->getId(), $uuid);
 
             return $this->respondUpdatedResource();
 
