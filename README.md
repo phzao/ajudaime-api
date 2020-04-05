@@ -1,7 +1,7 @@
 # API Be The Hero
 
-A simple API to control donations to people who need some.
-This API use elasticsearch.
+A simple API to control donations to people who need. 
+This API use elasticsearch using that `` https: // github.com / phzao / Ajudaime-db``
 
 Ps. This API was made on 2 days and is there is no unit tests for routes yet. 
 
