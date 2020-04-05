@@ -37,7 +37,7 @@ class ExceptionListener
         /* @var $exception */
         $exception = $event->getThrowable();
 
-        if ($_ENV["APP_ENV"]==="dev") {
+        if ($_ENV["APP_ENV"]==="dev" || $_ENV["APP_ENV"]==="test") {
             return;
         }
 

@@ -2,8 +2,8 @@
 
 namespace App\Controller;
 
+use App\Services\Entity\Interfaces\DonationServiceInterface;
 use App\Services\Entity\Interfaces\TalkServiceInterface;
-use App\Services\Entity\Interfaces\TransactionServiceInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
 use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
@@ -15,24 +15,24 @@ use Symfony\Component\Routing\Annotation\Route;
 class TalkController extends APIController
 {
     /**
-     * @Route("/api/v1/talks/{transaction_id}", methods={"POST"})
+     * @Route("/api/v1/talks/{donation_id}", methods={"POST"})
      * @throws \Exception
      */
     public function save(Request $request,
-                         $transaction_id,
-                         TransactionServiceInterface $transactionService,
+                         $donation_id,
+                         DonationServiceInterface $donationService,
                          TalkServiceInterface $talkService)
     {
         try {
             $data = $request->request->all();
             $user = $this->getUser();
-            $transaction = $transactionService->getTransactionIdOrFail($transaction_id);
+            $donation = $donationService->getDonationIdOrFail($donation_id);
 
             $talkService->thisTalkGoesBeyondTheUnreadLimitOfOrFail(5,
                                                                    $user->getId(),
-                                                                   $transaction_id);
+                                                                   $donation_id);
 
-            $data["transaction"] = $transaction;
+            $data["donation"] = $donation;
             $data["origin"] = $user->getId();
 
             $talk = $talkService->register($data);

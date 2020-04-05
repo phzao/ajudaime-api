@@ -2,17 +2,17 @@
 
 namespace App\Entity;
 
-use App\Entity\Interfaces\TransactionInterface;
+use App\Entity\Interfaces\DonationInterface;
 use App\Entity\Traits\SimpleTime;
 use App\Utils\Enums\GeneralTypes;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 
-class Transaction implements TransactionInterface
+class Donation implements DonationInterface
 {
     use SimpleTime, ModelBase;
 
-    const ELASTIC_INDEX = "transactions";
+    const ELASTIC_INDEX = "donations";
 
     /**
      * @ORM\Id()
@@ -144,5 +144,17 @@ class Transaction implements TransactionInterface
             "index" => self::ELASTIC_INDEX,
             "body" => $this->getOriginalData()
         ];
+    }
+
+    public function done(): void
+    {
+        $this->done_at = new \DateTime();
+        $this->status = GeneralTypes::STATUS_DONE;
+    }
+
+    public function cancel(): void
+    {
+        $this->canceled_at = new \DateTime();
+        $this->status = GeneralTypes::STATUS_CANCEL;
     }
 }

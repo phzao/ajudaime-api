@@ -17,7 +17,6 @@ class Need implements NeedInterface
     use SimpleTime, ModelBase;
 
     const ELASTIC_INDEX = "needs";
-    const NULL_VALUE = "NULL";
 
     /**
      * @ORM\Id()
@@ -39,6 +38,16 @@ class Need implements NeedInterface
     protected $needsList;
 
     /**
+     * @Assert\NotBlank(message="Uma mensagem para essa ajuda é requerida!")
+     * @Assert\Length(
+     *      max = 200,
+     *      maxMessage = "A Mensagem deve ter no máximo {{ limit }} caracteres"
+     * )
+     * @ORM\Column(type="string", length=200, unique=true)
+     */
+    protected $message;
+
+    /**
      * @var string
      * @Assert\NotBlank(message="The status is required!")
      * @Assert\Choice({"enable", "disable"})
@@ -53,6 +62,7 @@ class Need implements NeedInterface
         "id",
         "user",
         "needsList",
+        "message",
         "created_at",
     ];
 
@@ -92,6 +102,7 @@ class Need implements NeedInterface
             "id" => $this->id,
             "user" => $this->user,
             "status" => $this->status,
+            "message" => $this->message,
             "needsList" => $this->needsList,
             "created_at" => $this->created_at,
             "updated_at" => $this->updated_at
@@ -129,6 +140,7 @@ class Need implements NeedInterface
                             ]
                         ],
                         "needsList" => ["type" => "text"],
+                        "message" => ["type" => "text"],
                         "status" => ["type" => "text"],
                         "created_at" => ["type" => "date"],
                         "updated_at" => ["type" => "date", "null_value" => "NULL"],
@@ -144,5 +156,11 @@ class Need implements NeedInterface
             "index" => self::ELASTIC_INDEX,
             "body" => $this->getOriginalData()
         ];
+    }
+
+    public function disable(): void
+    {
+        $this->updated_at = new \DateTime();
+        $this->status = GeneralTypes::STATUS_DISABLE;
     }
 }

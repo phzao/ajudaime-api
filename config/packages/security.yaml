@@ -15,9 +15,12 @@ security:
             pattern: ^/(_(profiler|wdt)|css|images|js)/
             security: false
         api:
-            pattern: ^/((api/v1)|(register)|(authenticate-demo)|(authenticate)|(google-authenticate)|(oauth-authenticate))$
+            pattern: ^/((api/v1)|(google-authenticate)|(register))$
             security: false
 
+        public:
+            pattern: ^/public
+            anonymous: true
         main:
             stateless: true
             guard:

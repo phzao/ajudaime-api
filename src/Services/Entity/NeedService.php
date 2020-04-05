@@ -133,4 +133,106 @@ final class NeedService implements NeedServiceInterface
 
         return $need;
     }
+
+    public function update(array $data, array $user): void
+    {
+        $match = [
+            "user.id" => $user["id"],
+            "id" => $data["id"],
+            "status" => GeneralTypes::STATUS_ENABLE
+        ];
+
+        $query = $this->elasticQueries->getBoolMustMatchBy($this->needIndex, $match);
+
+        $query["size"] = 1;
+
+        $res = $this->repository->search($query);
+
+        if (empty($res["results"])) {
+            throw new NotFoundHttpException("Lista não localizada");
+        }
+
+        $needSaved = $res["results"][0];
+
+        $this->need->setAttributes($needSaved);
+
+        $data["user"] = $user;
+
+        $this->need->setAttributes($data);
+
+        $this->validation->entityIsValidOrFail($this->need);
+
+        $needUpdated = $this->need->getFullDataToUpdateIndex();
+
+        $this->repository->update($needUpdated);
+    }
+
+    public function remove(string $need_id, string $user_id): void
+    {
+        $match = [
+            "user.id" => $user_id,
+            "id" => $need_id,
+            "status" => GeneralTypes::STATUS_ENABLE
+        ];
+
+        $query = $this->elasticQueries->getBoolMustMatchBy($this->needIndex, $match);
+
+        $query["size"] = 1;
+
+        $res = $this->repository->search($query);
+
+        if (empty($res["results"])) {
+            throw new NotFoundHttpException("Lista não localizada");
+        }
+
+        $match = [
+            "index" => $this->needIndex,
+            "id" => $need_id
+        ];
+
+        $this->repository->delete($match);
+    }
+
+    public function disableNeedById(string $need_id): void
+    {
+        $match = [
+            "id" => $need_id,
+            "status" => GeneralTypes::STATUS_ENABLE
+        ];
+
+        $query = $this->elasticQueries->getBoolMustMatchBy($this->needIndex, $match);
+
+        $query["size"] = 1;
+
+        $res = $this->repository->search($query);
+
+        if (empty($res["results"])) {
+            throw new NotFoundHttpException("Lista não localizada");
+        }
+
+        $needSaved = $res["results"][0];
+
+        $this->need->setAttributes($needSaved);
+        $this->need->disable();
+
+        $needUpdated = $this->need->getFullDataToUpdateIndex();
+
+        $this->repository->update($needUpdated);
+    }
+
+    public function getNeedsListByUser(string $user_id): array
+    {
+        $match = [
+            "user.id" => $user_id
+        ];
+
+        $query = $this->elasticQueries->getBoolMustMatchBy($this->needIndex, $match);
+        $res = $this->repository->search($query);
+
+        if (!empty($res["results"])) {
+            return $res["results"];
+        }
+
+        return [];
+    }
 }

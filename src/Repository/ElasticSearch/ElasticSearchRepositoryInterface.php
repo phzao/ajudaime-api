@@ -11,6 +11,8 @@ interface ElasticSearchRepositoryInterface
 
     public function update(array $data);
 
+    public function delete(array $data);
+
     public function isIndexExist(array $index);
 
     public function get(array $params);

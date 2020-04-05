@@ -110,10 +110,4 @@ final class UserService implements UserServiceInterface
 
         return $this->repository->get($params);
     }
-
-    public function update(array $user): void
-    {
-        $user_index = $this->user->getElasticIndexName();
-        $this->repository->update($user);
-    }
 }

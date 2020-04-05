@@ -64,8 +64,8 @@ class User implements UsuarioInterface, ModelInterface, SimpleTimeInterface
      * @Assert\Length(
      *      min = 10,
      *      max = 20,
-     *      minMessage = "Telefone pode ter no máximo {{ limit }} caracteres",
-     *      maxMessage = "Telefone pode ter no mínimo {{ limit }} caracteres"
+     *      minMessage = "Telefone pode ter no máximo {{ limit }} caracteres! Formato (xx) xxxxx-xxxx",
+     *      maxMessage = "Telefone pode ter no mínimo {{ limit }} caracteres! Formato (xx) xxxxx-xxxx"
      * )
      * @ORM\Column(type="string", length=20, nullable=true)
      */
@@ -355,7 +355,7 @@ class User implements UsuarioInterface, ModelInterface, SimpleTimeInterface
             "name" => $this->name,
             "whatsapp" => $this->whatsapp,
             "message" => $this->message,
-            "location" => $this->location,
+            "location" => $this->location
         ];
     }
 }

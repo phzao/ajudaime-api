@@ -8,4 +8,6 @@ namespace App\Entity\Interfaces;
 interface NeedInterface extends ModelInterface
 {
     public function setUser($user);
+
+    public function disable(): void;
 }

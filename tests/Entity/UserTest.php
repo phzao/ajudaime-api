@@ -27,61 +27,32 @@ class UserTest extends TestCase
         $this->assertInstanceOf(ModelInterface::class, $user);
         $this->assertInstanceOf(SimpleTimeInterface::class, $user);
 
-
-        $this->assertIsArray($user->getRoles());
-        $this->assertIsArray($user->getLoginData());
-        $this->assertEmpty($user->getName());
-        $this->assertEmpty($user->getId());
-        $this->assertIsObject($user->getUser());
+        $this->assertIsArray($user->getFullDataToUpdateIndex());
         $this->assertIsArray($user->getFullData());
         $this->assertIsArray($user->getOriginalData());
-        $this->assertIsArray($user->getAllAttributesDateAndFormat());
-        $this->assertInstanceOf(ArrayCollection::class, $user->getPlaces());
-        $this->assertInstanceOf(ArrayCollection::class, $user->getCategories());
-        $this->assertNull($user->getDeletedAt());
+        $this->assertIsArray($user->getDataToInsert());
+        $this->assertIsArray($user->getDataResume());
+        $this->assertIsArray($user->getElasticSearchMapping());
+        $this->assertIsArray($user->getElasticIndexName());
         $this->assertIsArray($user->getNameAndId());
-        $this->assertIsArray($user->getRoles());
-        $this->assertEquals('enable', $user->getStatus());
-        $this->assertInstanceOf(ArrayCollection::class, $user->getApiTokens());
-        $this->assertIsString($user->getDateTimeStringFrom(''));
-
-        $this->assertEquals([
-                                "id",
-                                "email",
-                                "name",
-                                "status",
-                                "created_at",
-                                "updated_at",
-                                "deleted_at"
-                            ], array_keys($user->getOriginalData()));
-
-        $this->assertEquals([
-                                "id",
-                                "email",
-                                "name",
-                                "status",
-                                "status_description",
-                                "created_at",
-                                "updated_at"
-                            ], array_keys($user->getFullData()));
     }
 
-    public function testSettingData()
+    public function testFullDataToUpdateIndex()
     {
         $user = new User();
 
-        $data = [
-            "name" => "Jacob",
-            "email" => "eu@tu.com",
-            "password" => "12345"
-        ];
+        $userUpdate = $user->getFullDataToUpdateIndex();
 
-        $user->setAttributes($data);
-
-        $userData = $user->getFullData();
-
-        $this->assertEquals($data["name"], $userData["name"]);
-        $this->assertEquals($data["email"], $userData["email"]);
+        $this->assertCount(4, $userUpdate);
+        $this->assertCount(11, $userUpdate["body"]["doc"]);
     }
 
+    public function testIndexName()
+    {
+        $user = new User();
+
+        $userIndex = $user->getElasticIndexName();
+
+        $this->assertEquals(["index"=>"users"], $userIndex);
+    }
 }

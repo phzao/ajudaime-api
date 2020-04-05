@@ -7,35 +7,10 @@ namespace App\Tests;
  */
 trait Authenticate
 {
-    protected $email = "me@me.com";
-    protected $password = "123456";
     protected $registeredData = [];
 
-    public function getTokenAuthenticate($email = null, $password = null)
+    public function getTokenAuthenticate()
     {
-        $emailToRegister = empty($email)?$this->email: $email;
-        $passwordToRegister = empty($password)?$this->password: $password;
-
-        $this->client->request('POST', '/register', [
-            "email" => $emailToRegister,
-            "password" => $passwordToRegister
-        ]);
-
-        $this->assertEquals(201, $this->client->getResponse()->getStatusCode());
-
-        $res = $this->client->getResponse()->getContent();
-        $user = json_decode($res, true);
-
-        $this->registeredData = $user["data"];
-
-        $this->client->request('POST', '/authenticate', [
-            "email" => $emailToRegister,
-            "password" => $passwordToRegister
-        ]);
-
-        $res    = $this->client->getResponse()->getContent();
-        $result = json_decode($res, true);
-        
-        return $result["data"];
+        return "d75eb00f544d7fb2b2471089e408db66db25b1f9e193b6b49e5c8f70d0cfb8f713721515e5d0137310ec0517ca444f3584f7925b7ac53cfe06ca0b9c0bf74d9a8b7d1128681196a8d2ca1c5a1cd2b93eb102a0fcca68a6554851f97466ce2580d88dde3e8163f58c85e8580b8179f14ec3b280332523467f037c67";
     }
 }

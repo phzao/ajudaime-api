@@ -31,9 +31,9 @@ class Talks implements TalkInterface
     protected $status;
 
     /**
-     * @Assert\NotBlank(message="É necessário informar uma transação!")
+     * @Assert\NotBlank(message="É necessário informar uma doação!")
      */
-    protected $transaction;
+    protected $donation;
 
     /**
      * @Assert\NotBlank(message="Uma mensagem é obrigatória!")
@@ -51,7 +51,7 @@ class Talks implements TalkInterface
     protected $attributes = [
         "id",
         "origin",
-        "transaction",
+        "donation",
         "message",
         "created_at"
     ];
@@ -87,7 +87,7 @@ class Talks implements TalkInterface
         return [
             "id" => $this->id,
             "origin" => $this->origin,
-            "transaction" => $this->transaction,
+            "donation" => $this->donation,
             "status" => $this->status,
             "created_at" => $this->created_at,
             "message" => $this->message,
@@ -116,7 +116,7 @@ class Talks implements TalkInterface
                     "properties" => [
                         "id" => ["type" => "keyword"],
                         "origin" => ["type" => "keyword"],
-                        "transaction" => ["type" => "keyword"],
+                        "donation" => ["type" => "keyword"],
                         "status" => ["type" => "text"],
                         "message" => ["type" => "text", "null_value" => "NULL"],
                         "created_at" => ["type" => "date"],

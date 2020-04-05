@@ -54,6 +54,11 @@ class ElasticSearchRepository implements ElasticSearchRepositoryInterface
         return $this->clientBuilder->update($data);
     }
 
+    public function delete(array $data)
+    {
+        return $this->clientBuilder->delete($data);
+    }
+
     public function get(array $params)
     {
         try {
