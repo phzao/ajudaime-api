@@ -3,6 +3,8 @@
 A simple API to control donations to people who need some.
 This API use elasticsearch.
 
+Ps. This API was made on 2 days and is there is no unit tests for routes yet. 
+
 ## Requirements
 
 You must have installed Git, Docker, Docker-compose and Make before proceeding.
