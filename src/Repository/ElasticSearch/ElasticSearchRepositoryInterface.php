@@ -20,4 +20,6 @@ interface ElasticSearchRepositoryInterface
     public function search(array $array): array;
 
     public function getOneBy(array $array): array;
+
+    public function deleteIndex(array $index);
 }

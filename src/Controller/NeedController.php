@@ -88,6 +88,24 @@ class NeedController extends APIController
     }
 
     /**
+     * @Route("/api/v1/needs/{uuid}", methods={"GET"})
+     */
+    public function getOne($uuid, NeedServiceInterface $needService)
+    {
+        try {
+            $need = $needService->getOneByIdAndEnableOrFail($uuid);
+
+            return $this->respondSuccess($need);
+        } catch (NotFoundHttpException $exception) {
+
+            return $this->respondNotFoundError($exception->getMessage());
+        } catch (\Exception $exception) {
+
+            return $this->respondBadRequestError($exception->getMessage());
+        }
+    }
+
+    /**
      * @Route("/public/needs/{user_id}/user", methods={"GET"})
      */
     public function list($user_id, NeedServiceInterface $needService)

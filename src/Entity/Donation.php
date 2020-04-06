@@ -66,7 +66,7 @@ class Donation implements DonationInterface
     public function getElasticIndexName():array
     {
         return [
-            "index" => self::ELASTIC_INDEX
+            "index" => $this->getIndexName()
         ];
     }
 
@@ -93,7 +93,7 @@ class Donation implements DonationInterface
     public function getFullDataToUpdateIndex(): array
     {
         return [
-            'index' => self::ELASTIC_INDEX,
+            'index' => $this->getIndexName(),
             'id'    => $this->id,
             'type'  => '_doc',
             'body'  => [
@@ -105,7 +105,7 @@ class Donation implements DonationInterface
     public function getElasticSearchMapping(): array
     {
         return [
-            "index" => self::ELASTIC_INDEX,
+            "index" => $this->getIndexName(),
             "body" => [
                 "mappings" => [
                     "properties" => [
@@ -113,8 +113,6 @@ class Donation implements DonationInterface
                         "user" => [
                             "properties" => [
                                 "id" => ["type" => "keyword"],
-                                "whatsapp" => ["type" => "integer", "null_value" => "NULL"],
-                                "email" => ["type" => "keyword"],
                                 "name" => ["type" => "text"],
                                 "message" => ["type" => "text", "null_value" => "NULL"],
                                 "localization" => ["type" => "geo_point"],
@@ -141,7 +139,7 @@ class Donation implements DonationInterface
     public function getDataToInsert(): array
     {
         return [
-            "index" => self::ELASTIC_INDEX,
+            "index" => $this->getIndexName(),
             "body" => $this->getOriginalData()
         ];
     }
@@ -155,7 +153,7 @@ class Donation implements DonationInterface
     public function cancel(): void
     {
         $this->canceled_at = new \DateTime();
-        $this->status = GeneralTypes::STATUS_CANCEL;
+        $this->status = GeneralTypes::STATUS_CANCELED;
     }
 
     public function confirm(): void

@@ -48,10 +48,11 @@ Private Routes
 POST - http://localhost:8888/api/v1/needs 
 PUT - http://localhost:8888/api/v1/needs/{uuid}
 DELETE - http://localhost:8888/api/v1/needs/{uuid}
+GET - http://localhost:8888/api/v1/needs/{uuid} -> show details 
 
-PUT - http://localhost:8888/api/v1/donations/{uuid}/done -> did by who help
-PUT - http://localhost:8888/api/v1/donations/{uuid}/cancel -> did by who help
-PUT - http://localhost:8888/api/v1/donations/{uuid}/confirm -> did by who need help
+PUT - http://localhost:8888/api/v1/donations/{uuid}/done -> did by a helper
+PUT - http://localhost:8888/api/v1/donations/{uuid}/cancel -> did by a helper
+PUT - http://localhost:8888/api/v1/donations/{uuid}/confirm -> did by who needs help
 POST - http://localhost:8888/api/v1/donations
 
 POST - http://localhost:8888/api/v1/talks/{donation_id}

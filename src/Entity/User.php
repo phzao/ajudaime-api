@@ -290,7 +290,7 @@ class User implements UsuarioInterface, ModelInterface, SimpleTimeInterface
     public function getElasticSearchMapping(): array
     {
         return [
-            "index" => self::ELASTIC_INDEX,
+            "index" => $this->getIndexName(),
             "body" => [
                 "mappings" => [
                     "properties" => [
@@ -326,7 +326,7 @@ class User implements UsuarioInterface, ModelInterface, SimpleTimeInterface
     public function getDataToInsert(): array
     {
         return [
-            "index" => self::ELASTIC_INDEX,
+            "index" => $this->getIndexName(),
             "body" => $this->getOriginalData()
         ];
     }
@@ -334,7 +334,7 @@ class User implements UsuarioInterface, ModelInterface, SimpleTimeInterface
     public function getFullDataToUpdateIndex(): array
     {
         return [
-            'index' => self::ELASTIC_INDEX,
+            'index' => $this->getIndexName(),
             'id'    => $this->id,
             'type'  => '_doc',
             'body'  => [
@@ -346,7 +346,7 @@ class User implements UsuarioInterface, ModelInterface, SimpleTimeInterface
     public function getElasticIndexName():array
     {
         return [
-            "index" => self::ELASTIC_INDEX
+            "index" => $this->getIndexName()
         ];
     }
 
@@ -354,9 +354,7 @@ class User implements UsuarioInterface, ModelInterface, SimpleTimeInterface
     {
         return [
             "id" => $this->id,
-            "email" => $this->email,
             "name" => $this->name,
-            "whatsapp" => $this->whatsapp,
             "message" => $this->message,
             "localization" => $this->localization
         ];

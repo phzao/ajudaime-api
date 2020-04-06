@@ -48,4 +48,13 @@ trait ModelBase
     {
         return $this->deleted_at;
     }
+
+    public function getIndexName(): string
+    {
+        if ($_ENV["APP_ENV"]==="test") {
+            return self::ELASTIC_INDEX."_test";
+        }
+
+        return self::ELASTIC_INDEX;
+    }
 }

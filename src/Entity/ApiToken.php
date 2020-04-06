@@ -123,7 +123,7 @@ class ApiToken implements ApiTokenInterface
     public function getElasticSearchMapping(): array
     {
         return [
-            "index" => self::ELASTIC_INDEX,
+            "index" => $this->getIndexName(),
             "body" => [
                 "mappings" => [
                     "properties" => [
@@ -152,7 +152,7 @@ class ApiToken implements ApiTokenInterface
     public function getDataToInsert(): array
     {
         return [
-            "index" => self::ELASTIC_INDEX,
+            "index" => $this->getIndexName(),
             "body" => [
                 "token" => $this->token,
                 "user" => $this->user,
@@ -177,7 +177,7 @@ class ApiToken implements ApiTokenInterface
     public function getElasticIndexName():array
     {
         return [
-            "index" => self::ELASTIC_INDEX
+            "index" => $this->getIndexName()
         ];
     }
 
@@ -209,7 +209,7 @@ class ApiToken implements ApiTokenInterface
     public function getFullDataToUpdateIndex(): array
     {
         return [
-            'index' => self::ELASTIC_INDEX,
+            'index' => $this->getIndexName(),
             'id'    => $this->id,
             'type'  => '_doc',
             'body'  => [

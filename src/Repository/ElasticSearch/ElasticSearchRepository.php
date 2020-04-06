@@ -31,7 +31,11 @@ class ElasticSearchRepository implements ElasticSearchRepositoryInterface
         } catch (\Exception $exception) {
             throw new CouldNotConnectToHost('ElasticSearch Offline');
         }
+    }
 
+    public function deleteIndex(array $index)
+    {
+        $this->clientBuilder->indices()->delete($index);
     }
 
     public function index(array $data)

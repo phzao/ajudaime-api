@@ -73,7 +73,7 @@ class Talks implements TalkInterface
     public function getElasticIndexName():array
     {
         return [
-            "index" => self::ELASTIC_INDEX
+            "index" => $this->getIndexName()
         ];
     }
 
@@ -98,7 +98,7 @@ class Talks implements TalkInterface
     public function getFullDataToUpdateIndex(): array
     {
         return [
-            'index' => self::ELASTIC_INDEX,
+            'index' => $this->getIndexName(),
             'id'    => $this->id,
             'type'  => '_doc',
             'body'  => [
@@ -110,7 +110,7 @@ class Talks implements TalkInterface
     public function getElasticSearchMapping(): array
     {
         return [
-            "index" => self::ELASTIC_INDEX,
+            "index" => $this->getIndexName(),
             "body" => [
                 "mappings" => [
                     "properties" => [
@@ -130,7 +130,7 @@ class Talks implements TalkInterface
     public function getDataToInsert(): array
     {
         return [
-            "index" => self::ELASTIC_INDEX,
+            "index" => $this->getIndexName(),
             "body" => $this->getOriginalData()
         ];
     }

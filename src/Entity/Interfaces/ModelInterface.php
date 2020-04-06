@@ -30,4 +30,6 @@ interface ModelInterface
     public function getElasticIndexName(): array;
 
     public function getFullDataToUpdateIndex(): array;
+
+    public function getIndexName(): string;
 }

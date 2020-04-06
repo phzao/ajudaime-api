@@ -16,9 +16,9 @@
         <env name="SYMFONY_DEPRECATIONS_HELPER" value="weak" />
     </php>
 
-    <extensions>
-        <extension class="DAMA\DoctrineTestBundle\PHPUnit\PHPUnitExtension"/>
-    </extensions>
+    <!--<extensions>-->
+        <!--<extension class="DAMA\DoctrineTestBundle\PHPUnit\PHPUnitExtension"/>-->
+    <!--</extensions>-->
 
     <testsuites>
         <testsuite name="Project Test Suite">

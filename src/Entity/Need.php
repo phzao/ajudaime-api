@@ -90,7 +90,7 @@ class Need implements NeedInterface
     public function getElasticIndexName():array
     {
         return [
-            "index" => self::ELASTIC_INDEX
+            "index" => $this->getIndexName()
         ];
     }
 
@@ -116,7 +116,7 @@ class Need implements NeedInterface
     public function getFullDataToUpdateIndex(): array
     {
         return [
-            'index' => self::ELASTIC_INDEX,
+            'index' => $this->getIndexName(),
             'id'    => $this->id,
             'type'  => '_doc',
             'body'  => [
@@ -128,7 +128,7 @@ class Need implements NeedInterface
     public function getElasticSearchMapping(): array
     {
         return [
-            "index" => self::ELASTIC_INDEX,
+            "index" => $this->getIndexName(),
             "body" => [
                 "mappings" => [
                     "properties" => [
@@ -136,8 +136,6 @@ class Need implements NeedInterface
                         "user" => [
                             "properties" => [
                                 "id" => ["type" => "keyword"],
-                                "whatsapp" => ["type" => "integer", "null_value" => "NULL"],
-                                "email" => ["type" => "keyword"],
                                 "name" => ["type" => "text"],
                                 "message" => ["type" => "text", "null_value" => "NULL"],
                                 "localization" => ["type" => "geo_point"]
@@ -164,7 +162,7 @@ class Need implements NeedInterface
     public function getDataToInsert(): array
     {
         return [
-            "index" => self::ELASTIC_INDEX,
+            "index" => $this->getIndexName(),
             "body" => $this->getOriginalData()
         ];
     }
