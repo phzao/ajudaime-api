@@ -52,7 +52,7 @@ GET - http://localhost:8888/api/v1/needs/{uuid} -> show details
 
 PUT - http://localhost:8888/api/v1/donations/{uuid}/done -> did by a helper
 PUT - http://localhost:8888/api/v1/donations/{uuid}/cancel -> did by a helper
-PUT - http://localhost:8888/api/v1/donations/{uuid}/confirm -> did by who needs help
+PUT - http://localhost:8888/api/v1/donations/{uuid}/confirm -> did by who needy help
 POST - http://localhost:8888/api/v1/donations
 
 POST - http://localhost:8888/api/v1/talks/{donation_id}
@@ -60,3 +60,12 @@ POST - http://localhost:8888/api/v1/talks/{donation_id}
 PUT - http://localhost:8888/api/v1/users
 
 ````
+
+## How this works
+
+Some rules for using this API.
+- People in need can ask for help at a time, after being served can make a new request.
+- Helpers can help select up to three people in need and have 48 hours to complete or aid will be canceled. (Time functionality is in development)
+- If the needy tries to register words that are blacklisted, it will be blocked. (is in development)
+- If there are 6 cancellations of donations due to time, help will be blocked. (is in development)
+- The list of needy is presented by filtering by country (is under development)

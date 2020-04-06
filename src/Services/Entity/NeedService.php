@@ -259,4 +259,14 @@ final class NeedService implements NeedServiceInterface
 
         return $res["results"];
     }
+
+    public function removeDonationCanceled(string $need_id)
+    {
+        $needSaved = $this->getOneByIdAndEnableOrFail($need_id);
+
+        $needSaved["donation"] = null;
+        $this->need->setAttributes($needSaved);
+        $needUpdated = $this->need->getFullDataToUpdateIndex();
+        $this->repository->update($needUpdated);
+    }
 }

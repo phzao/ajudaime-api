@@ -29,4 +29,6 @@ interface NeedServiceInterface
     public function getOneByIdAndEnableOrFail(string $need_id): array;
 
     public function getAllNeedsNotCanceled(): array;
+
+    public function removeDonationCanceled(string $need_id);
 }

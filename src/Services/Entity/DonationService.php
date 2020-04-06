@@ -105,9 +105,9 @@ final class DonationService implements DonationServiceInterface
 
     public function thisDonationGoesBeyondTheProcessingLimitOfOrFail(int $allowed_number, string $user_id)
     {
-        $needs = $this->getDonationsListProcessingByUser($user_id, $allowed_number);
+        $donations = $this->getDonationsListProcessingByUser($user_id, $allowed_number);
 
-        if (count($needs["results"]) >= 3) {
+        if (count($donations["results"]) >= 3) {
             throw new BadRequestHttpException("Quantidade limite de $allowed_number listas em aberto atingida!");
         }
     }
@@ -161,9 +161,12 @@ final class DonationService implements DonationServiceInterface
         $donationSaved = $res["results"][0];
         $this->donation->setAttributes($donationSaved);
         $this->donation->confirm();
-        $this->donationToNeed = $this->donation->getResumeToNeed();
 
-        return $donationSaved;
+        $donationUpdated = $this->donation->getFullDataToUpdateIndex();
+
+        $this->repository->update($donationUpdated);
+
+        return $this->donation->getResumeToNeed();
     }
 
     public function getOneByIdUserIdProcessingOrFail(string $user_id, string $donation_id): array
@@ -192,9 +195,11 @@ final class DonationService implements DonationServiceInterface
 
         $this->donation->setAttributes($donationSaved);
         $this->donation->done();
-        $this->donationToNeed = $this->donation->getResumeToNeed();
 
-        return $donationSaved;
+        $donationUpdated = $this->donation->getFullDataToUpdateIndex();
+        $this->repository->update($donationUpdated);
+
+        return $this->donation->getResumeToNeed();
     }
 
     public function cancelDonation(string $user_id, string $donation_id): array
@@ -203,7 +208,10 @@ final class DonationService implements DonationServiceInterface
         $this->donation->setAttributes($donationSaved);
         $this->donation->cancel();
 
-        return $donationSaved;
+        $donationUpdated = $this->donation->getFullDataToUpdateIndex();
+        $this->repository->update($donationUpdated);
+
+        return $this->donation->getResumeToNeed();
     }
 
     public function getDonationsByUser(string $user_id): array

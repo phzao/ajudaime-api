@@ -56,11 +56,14 @@ class DonationController extends APIController
      * @throws \Exception
      */
     public function cancel($uuid,
+                           NeedServiceInterface $needService,
                            DonationServiceInterface $donationService)
     {
         try {
             $user = $this->getUser();
-            $donationService->cancelDonation($user->getId(), $uuid);
+            $donation = $donationService->cancelDonation($user->getId(), $uuid);
+
+            $needService->removeDonationCanceled($donation["need"]["id"]);
 
             return $this->respondUpdatedResource();
 
