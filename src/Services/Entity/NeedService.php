@@ -15,6 +15,8 @@ use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
 
 final class NeedService implements NeedServiceInterface
 {
+    const ROWS_ALLOWED = 3;
+
     private $repository;
 
     private $elasticQueries;
@@ -47,7 +49,7 @@ final class NeedService implements NeedServiceInterface
     public function getNeedsListUnblockedByUser(string $user_id, $result_quantity = 1): array
     {
         $match = [
-            "user" => $user_id,
+            "user.id" => $user_id,
         ];
 
         $notMatch = [
@@ -79,8 +81,9 @@ final class NeedService implements NeedServiceInterface
 
     public function thisNeedGoesBeyondTheOpensLimitOfOrFail(int $allowed_number, string $user_id)
     {
-        $needs = $this->getNeedsListUnblockedByUser($user_id, $allowed_number);
-        if (count($needs["results"]) >= 3) {
+        $needs = $this->getNeedsListUnblockedByUser($user_id, self::ROWS_ALLOWED);
+
+        if (count($needs["results"]) >= $allowed_number) {
             throw new BadRequestHttpException("Quantidade limite de $allowed_number listas em aberto atingida!");
         }
     }
@@ -252,10 +255,6 @@ final class NeedService implements NeedServiceInterface
         $query = $this->elasticQueries->getBoolMustMatchBy($this->needIndex, $match);
 
         $res = $this->repository->search($query);
-
-        if (empty($res["results"])) {
-            throw new NotFoundHttpException("Lista não localizada");
-        }
 
         return $res["results"];
     }

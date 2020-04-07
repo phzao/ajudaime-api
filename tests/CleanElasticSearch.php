@@ -2,6 +2,8 @@
 
 namespace App\Tests;
 
+use App\Repository\ElasticSearch\ElasticSearchRepository;
+
 /**
  * @package App\Tests
  */
@@ -9,11 +11,11 @@ trait CleanElasticSearch
 {
     protected $registeredData = [];
     protected $indexes = [
-        "api_tokens_test",
-        "donations_test",
-        "need_test",
-        "talks_test",
-        "user_test"
+        ["index" => "api_tokens_test"],
+        ["index" => "donations_test"],
+        ["index" => "needs_test"],
+        ["index" => "talks_test"],
+        ["index" => "users_test"]
     ];
 
     public function getTokenAuthenticate()
