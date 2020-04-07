@@ -23,7 +23,7 @@ class NeedController extends APIController
             $user = $this->getUser();
 
             $needService->thisNeedGoesBeyondTheOpensLimitOfOrFail(1, $user->getId());
-            dump("teste");exit;
+
             $data["user"] = $user->getDataResume();
             $needs = $needService->register($data);
 

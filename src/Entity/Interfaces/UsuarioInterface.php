@@ -22,4 +22,6 @@ interface UsuarioInterface extends UserInterface
     public function canAuthenticate(): bool;
 
     public function getDataResume(): array;
+
+    public function getFieldsAllowedUpdate(): array;
 }

@@ -76,7 +76,9 @@ class TokenAuthenticator extends AbstractGuardAuthenticator
             return;
         }
 
-        if (!$apiToken = $this->tokenService->getTokenNotExpiredBy($apiToken)) {
+        $apiToken = $this->tokenService->getTokenNotExpiredBy($apiToken);
+
+        if (empty($apiToken)) {
             return;
         }
 

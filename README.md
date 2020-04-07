@@ -58,6 +58,7 @@ POST - http://localhost:8888/api/v1/donations
 POST - http://localhost:8888/api/v1/talks/{donation_id}
 
 PUT - http://localhost:8888/api/v1/users
+GET - http://localhost:8888/api/v1/users -> show details
 
 ````
 

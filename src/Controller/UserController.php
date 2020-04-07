@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Repository\ElasticSearch\ElasticSearchRepositoryInterface;
 use App\Services\Validation\ValidateModelInterface;
+use App\Utils\Extract\ExtractDataSameKeyInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
@@ -20,11 +21,15 @@ class UserController extends APIController
      */
     public function update(Request $request,
                            ValidateModelInterface $validateModel,
-                           ElasticSearchRepositoryInterface $repository)
+                           ElasticSearchRepositoryInterface $repository,
+                           ExtractDataSameKeyInterface $extractDataSameKey)
     {
         try {
             $data = $request->request->all();
             $user = $this->getUser();
+            $fieldsAllowedUpdate = $user->getFieldsAllowedUpdate();
+            $data = $extractDataSameKey->getDataOnTheSameKeys($data, $fieldsAllowedUpdate);
+
             $user->setAttributes($data);
             $validateModel->entityIsValidOrFail($user);
 
@@ -32,6 +37,28 @@ class UserController extends APIController
             $repository->update($userUpdated);
 
             return $this->respondUpdatedResource();
+        } catch (UnprocessableEntityHttpException $exception) {
+
+            return $this->respondValidationFail($exception->getMessage());
+        }  catch (NotFoundHttpException $exception) {
+
+            return $this->respondNotFoundError($exception->getMessage());
+        } catch (\Exception $exception) {
+
+            return $this->respondBadRequestError($exception->getMessage());
+        }
+    }
+
+    /**
+     * @Route("", methods={"GET"})
+     */
+    public function showMe()
+    {
+        try {
+
+            $user = $this->getUser();
+
+            return $this->respondSuccess($user->getOriginalData());
         } catch (UnprocessableEntityHttpException $exception) {
 
             return $this->respondValidationFail($exception->getMessage());
