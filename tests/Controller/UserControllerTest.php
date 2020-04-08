@@ -69,7 +69,7 @@ class UserControllerTest extends WebTestCase
     {
         $token = $this->getTokenAuthenticate();
 
-        $data = [
+        $data["localization"] = [
             -27.60343655507399,
             -48.63020187959159
         ];
@@ -87,6 +87,36 @@ class UserControllerTest extends WebTestCase
                                 -27.60343655507399,
                                 -48.63020187959159
                             ], $userData["localization"]);
+    }
+
+    public function testUpdateLocalizationWithLatitudeWrongShouldFail()
+    {
+        $token = $this->getTokenAuthenticate();
+
+        $data["localization"] = [
+             "a",
+            -48.63020187959159
+        ];
+
+        $this->client->request('PUT', self::USER_ROUTE, $data,[], $token);
+        $this->assertResponseStatusCodeSame(422);
+        $this->assertJsonStringEqualsJsonString($this->client->getResponse()->getContent(),
+                                                '{"status":"fail","data":{"localization":"Latitude inv\u00e1lida"}}');
+    }
+
+    public function testUpdateLocalizationWithLongitudeWrongShouldFail()
+    {
+        $token = $this->getTokenAuthenticate();
+
+        $data["localization"] = [
+            -27.60343655507399,
+            "a"
+        ];
+
+        $this->client->request('PUT', self::USER_ROUTE, $data,[], $token);
+        $this->assertResponseStatusCodeSame(422);
+        $this->assertJsonStringEqualsJsonString($this->client->getResponse()->getContent(),
+                                                '{"status":"fail","data":{"localization":"Longitude inv\u00e1lida"}}');
     }
 
     public function testUpdateUserMessageOverLimitShouldFail()

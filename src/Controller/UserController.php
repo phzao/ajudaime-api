@@ -27,6 +27,7 @@ class UserController extends APIController
         try {
             $data = $request->request->all();
             $user = $this->getUser();
+
             $fieldsAllowedUpdate = $user->getFieldsAllowedUpdate();
             $data = $extractDataSameKey->getDataOnTheSameKeys($data, $fieldsAllowedUpdate);
 

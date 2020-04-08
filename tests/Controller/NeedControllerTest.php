@@ -22,6 +22,8 @@ class NeedControllerTest extends WebTestCase
 
     const NEED_ROUTE = "/api/v1/needs";
 
+    const DONATION_ROUTE = "/api/v1/donations";
+
     public function setUp()
     {
         parent::setUp();
@@ -106,27 +108,139 @@ class NeedControllerTest extends WebTestCase
         $this->assertEquals("my message to", $needData["needsList"]);
     }
 
-//    public function testRegisterTwoNeedsOpenShouldFail()
-//    {
-//        $token = $this->getTokenAuthenticate();
-//
-//        $data["needsList"] = "my message to";
-//        $data["message"] = "Food";
-//        $this->client->request('POST', self::NEED_ROUTE, $data,[], $token);
-//        $this->assertResponseStatusCodeSame(201);
-//
-//        $data["message"] = "my message to";
-//        $data["needsList"] = "Food";
-//        $this->client->request('POST', self::NEED_ROUTE, $data,[], $token);
-//        $this->assertResponseStatusCodeSame(201);
-//
-//        $res = json_decode($this->client->getResponse()->getContent(), true);
-//        dump($res);
-//
-//        $this->client->request('GET', 'public/needs', [],[], $token);
-//        $this->assertResponseStatusCodeSame(200);
-//
-//        $res = json_decode($this->client->getResponse()->getContent(), true);
-//        dump($res);
-//    }
+    public function testTryRegisterTwoNeedsWithoutADonationShouldFail()
+    {
+        $token = $this->getTokenAuthenticate();
+
+        $data["needsList"] = "my message to";
+        $data["message"] = "Food";
+        $this->client->request('POST', self::NEED_ROUTE, $data,[], $token);
+        $this->assertResponseStatusCodeSame(201);
+        sleep(1);
+
+        $data["message"] = "my message to";
+        $data["needsList"] = "Food";
+        $this->client->request('POST', self::NEED_ROUTE, $data,[], $token);
+        $this->assertResponseStatusCodeSame(400);
+        sleep(1);
+
+        $this->assertJsonStringEqualsJsonString($this->client->getResponse()->getContent(),
+                                                '{"status":"error","message":"Quantidade limite de 1 listas em aberto atingida!"}');
+    }
+
+    public function testTryUpdateANeedDontExistShouldFail()
+    {
+        $token = $this->getTokenAuthenticate();
+
+        $this->client->request('PUT', self::NEED_ROUTE."/fasfa-sdfsafa", [],[], $token);
+        $this->assertResponseStatusCodeSame(404);
+        $this->assertJsonStringEqualsJsonString($this->client->getResponse()->getContent(),
+                                                '{"status": "error","message": "Lista não localizada"}');
+    }
+
+    public function testTryUpdateANeedFromOtherUserShouldFail()
+    {
+        $token = $this->getTokenAuthenticate();
+
+        $data["needsList"] = "my message to";
+        $data["message"] = "Food";
+        $this->client->request('POST', self::NEED_ROUTE, $data,[], $token);
+        $this->assertResponseStatusCodeSame(201);
+        sleep(1);
+        $res = json_decode($this->client->getResponse()->getContent(), true);
+
+        $needOne = $res["data"];
+        $userTwo = $this->getTokenAuthenticate("you@your.mail");
+
+        $this->client->request('PUT', self::NEED_ROUTE."/".$needOne["id"], [],[], $userTwo);
+        $this->assertResponseStatusCodeSame(404);
+        $this->assertJsonStringEqualsJsonString($this->client->getResponse()->getContent(),
+                                                '{"status": "error","message": "Lista não localizada"}');
+    }
+
+    public function testTryUpdateMessageToNullShouldFail()
+    {
+        $token = $this->getTokenAuthenticate();
+
+        $data["needsList"] = "my message to";
+        $data["message"] = "Food";
+        $this->client->request('POST', self::NEED_ROUTE, $data,[], $token);
+        $this->assertResponseStatusCodeSame(201);
+        sleep(1);
+        $res = json_decode($this->client->getResponse()->getContent(), true);
+
+        $need = $res["data"];
+
+        $newData = ["message"=>null];
+
+        $this->client->request('PUT', self::NEED_ROUTE."/".$need["id"], $newData,[], $token);
+        $this->assertResponseStatusCodeSame(422);
+        $this->assertJsonStringEqualsJsonString($this->client->getResponse()->getContent(),
+                                                '{"status":"fail","data":{"message":"Uma mensagem para essa ajuda \u00e9 requerida!"}}');
+    }
+
+    public function testTryUpdateNeedsListToNullShouldFail()
+    {
+        $token = $this->getTokenAuthenticate();
+
+        $data["needsList"] = "my message to";
+        $data["message"] = "Food";
+        $this->client->request('POST', self::NEED_ROUTE, $data,[], $token);
+        $this->assertResponseStatusCodeSame(201);
+        sleep(1);
+
+        $res = json_decode($this->client->getResponse()->getContent(), true);
+
+        $need = $res["data"];
+
+        $newData = ["needsList"=>null];
+
+        $this->client->request('PUT', self::NEED_ROUTE."/".$need["id"], $newData,[], $token);
+        $this->assertResponseStatusCodeSame(422);
+        $this->assertJsonStringEqualsJsonString($this->client->getResponse()->getContent(),
+                                                '{"status":"fail","data":{"needsList":"Uma lista de necessidades \u00e9 obrigat\u00f3ria!"}}');
+    }
+
+    public function testTryRemoveANeedWhoHasDonationSetShouldFail()
+    {
+        $token = $this->getTokenAuthenticate();
+
+        $data["needsList"] = "my message to";
+        $data["message"] = "Food";
+        $this->client->request('POST', self::NEED_ROUTE, $data,[], $token);
+        $this->assertResponseStatusCodeSame(201);
+        sleep(1);
+
+        $res = json_decode($this->client->getResponse()->getContent(), true);
+
+        $need = $res["data"];
+
+        $newData = ["needsList"=>null];
+
+        $this->client->request('PUT', self::NEED_ROUTE."/".$need["id"], $newData,[], $token);
+        $this->assertResponseStatusCodeSame(422);
+        $this->assertJsonStringEqualsJsonString($this->client->getResponse()->getContent(),
+                                                '{"status":"fail","data":{"needsList":"Uma lista de necessidades \u00e9 obrigat\u00f3ria!"}}');
+    }
+
+    public function testTryRemoveANeedWithoutADonationShouldSuccess()
+    {
+        $token = $this->getTokenAuthenticate();
+
+        $data["needsList"] = "my message to";
+        $data["message"] = "Food";
+        $this->client->request('POST', self::NEED_ROUTE, $data,[], $token);
+        $this->assertResponseStatusCodeSame(201);
+        sleep(1);
+
+        $res = json_decode($this->client->getResponse()->getContent(), true);
+
+        $need = $res["data"];
+
+        $this->client->request('DELETE', self::NEED_ROUTE."/".$need["id"], [],[], $token);
+        $this->assertResponseStatusCodeSame(204);
+
+        $this->client->request('PUT', self::NEED_ROUTE."/".$need["id"], ["message"=>"change"],[], $token);
+        $this->assertResponseStatusCodeSame(404);
+    }
 }

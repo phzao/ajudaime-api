@@ -10,6 +10,7 @@ use App\Utils\Enums\GeneralTypes;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 use Symfony\Component\Validator\Constraints as Assert;
+use App\Validator\Constraints as CustomAssert;
 
 /**
  * @ORM\Entity
@@ -82,6 +83,9 @@ class User implements UsuarioInterface, ModelInterface, SimpleTimeInterface
      */
     protected $status;
 
+    /**
+     * @CustomAssert\LocalizationArray(message="Localização invalida")
+     */
     protected $localization;
 
     /**
