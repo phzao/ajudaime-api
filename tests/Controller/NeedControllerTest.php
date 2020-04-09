@@ -201,7 +201,7 @@ class NeedControllerTest extends WebTestCase
                                                 '{"status":"fail","data":{"needsList":"Uma lista de necessidades \u00e9 obrigat\u00f3ria!"}}');
     }
 
-    public function testTryRemoveANeedWhoHasDonationSetShouldFail()
+    public function testRemoveNeedWithDonationShouldSetCanceledOnDonationSuccess()
     {
         $token = $this->getTokenAuthenticate();
 
@@ -212,15 +212,25 @@ class NeedControllerTest extends WebTestCase
         sleep(1);
 
         $res = json_decode($this->client->getResponse()->getContent(), true);
-
         $need = $res["data"];
 
-        $newData = ["needsList"=>null];
+        $this->client->request('POST', self::DONATION_ROUTE."/".$need["id"], $data,[], $token);
+        sleep(1);
 
-        $this->client->request('PUT', self::NEED_ROUTE."/".$need["id"], $newData,[], $token);
-        $this->assertResponseStatusCodeSame(422);
-        $this->assertJsonStringEqualsJsonString($this->client->getResponse()->getContent(),
-                                                '{"status":"fail","data":{"needsList":"Uma lista de necessidades \u00e9 obrigat\u00f3ria!"}}');
+        $res = json_decode($this->client->getResponse()->getContent(), true);
+        $donation = $res["data"];
+
+        $this->client->request('DELETE', self::NEED_ROUTE."/".$need["id"], [],[], $token);
+        $this->assertResponseStatusCodeSame(204);
+        sleep(1);
+
+        $this->client->request('GET', self::DONATION_ROUTE."/".$donation["id"], [],[], $token);
+        $this->assertResponseStatusCodeSame(200);
+
+        $res = json_decode($this->client->getResponse()->getContent(), true);
+        $donationResult = $res["data"];
+
+        $this->assertEquals('canceled', $donationResult["status"]);
     }
 
     public function testTryRemoveANeedWithoutADonationShouldSuccess()
@@ -240,7 +250,58 @@ class NeedControllerTest extends WebTestCase
         $this->client->request('DELETE', self::NEED_ROUTE."/".$need["id"], [],[], $token);
         $this->assertResponseStatusCodeSame(204);
 
+        sleep(1);
         $this->client->request('PUT', self::NEED_ROUTE."/".$need["id"], ["message"=>"change"],[], $token);
+        $this->assertResponseStatusCodeSame(404);
+    }
+
+    public function testGetNeedDetailsFromUserShouldSuccess()
+    {
+        $token = $this->getTokenAuthenticate();
+
+        $data["needsList"] = "my message to";
+        $data["message"] = "Food";
+        $this->client->request('POST', self::NEED_ROUTE, $data,[], $token);
+        $this->assertResponseStatusCodeSame(201);
+        sleep(1);
+
+        $res = json_decode($this->client->getResponse()->getContent(), true);
+
+        $need = $res["data"];
+
+        $this->client->request('GET', self::NEED_ROUTE."/".$need["id"], [],[], $token);
+        $this->assertResponseStatusCodeSame(200);
+        $res = json_decode($this->client->getResponse()->getContent(), true);
+
+        $needResult = $res["data"];
+
+        $this->assertEquals("my message to", $needResult["needsList"]);
+        $this->assertEquals("Food", $needResult["message"]);
+    }
+
+    public function testGetNeedDetailsFromAnotherUserShouldFail()
+    {
+        $token = $this->getTokenAuthenticate();
+
+        $data["needsList"] = "my message to";
+        $data["message"] = "Food";
+        $this->client->request('POST', self::NEED_ROUTE, $data,[], $token);
+        $this->assertResponseStatusCodeSame(201);
+        sleep(1);
+
+        $token2 = $this->getTokenAuthenticate("you@your.com");
+
+        $data["needsList"] = "my message to";
+        $data["message"] = "Food";
+        $this->client->request('POST', self::NEED_ROUTE, $data,[], $token2);
+        $this->assertResponseStatusCodeSame(201);
+        sleep(1);
+
+        $res = json_decode($this->client->getResponse()->getContent(), true);
+
+        $needOTwo = $res["data"];
+
+        $this->client->request('GET', self::NEED_ROUTE."/".$needOTwo["id"], [],[], $token);
         $this->assertResponseStatusCodeSame(404);
     }
 }

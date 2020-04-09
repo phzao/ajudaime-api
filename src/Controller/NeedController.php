@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Services\Entity\Interfaces\DonationServiceInterface;
 use App\Services\Entity\Interfaces\NeedServiceInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -66,11 +67,16 @@ class NeedController extends APIController
     /**
      * @Route("/api/v1/needs/{uuid}", methods={"DELETE"})
      */
-    public function remove($uuid, NeedServiceInterface $needService)
+    public function remove($uuid,
+                           NeedServiceInterface $needService,
+                           DonationServiceInterface $donationService)
     {
         try {
             $user = $this->getUser();
             $needService->remove($uuid, $user->getId());
+            $donation_id = $needService->getDonationId();
+
+            $donationService->cancelDonationById($donation_id);
 
             return $this->respondUpdatedResource();
         } catch (NotFoundHttpException $exception) {
@@ -88,7 +94,8 @@ class NeedController extends APIController
     public function getOne($uuid, NeedServiceInterface $needService)
     {
         try {
-            $need = $needService->getOneByIdAndEnableOrFail($uuid);
+            $user = $this->getUser();
+            $need = $needService->getOneByIdAndUserOrFail($uuid, $user->getId());
 
             return $this->respondSuccess($need);
         } catch (NotFoundHttpException $exception) {

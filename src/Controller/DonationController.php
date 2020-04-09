@@ -13,22 +13,24 @@ use Symfony\Component\Routing\Annotation\Route;
 class DonationController extends APIController
 {
     /**
-     * @Route("/api/v1/donations", methods={"POST"})
+     * @Route("/api/v1/donations/{need_id}", methods={"POST"})
      * @throws \Exception
      */
     public function save(Request $request,
+                         $need_id,
                          NeedServiceInterface $needService,
                          DonationServiceInterface $donationService)
     {
         try {
-            $data = $request->request->all();
             $user = $this->getUser();
 
-            $donationService->ifExistADonationWithThisNeedMustFail($data, $user->getId());
+            $donationService->ifExistADonationWithThisNeedMustFail($need_id, $user->getId());
             $donationService->thisDonationGoesBeyondTheProcessingLimitOfOrFail(3, $user->getId());
 
+            $data = $request->request->all();
+
             $data["user"] = $user->getDataResume();
-            $need = $needService->getNeedByIdOrFail($data);
+            $need = $needService->getNeedByIdOrFail($need_id);
             $data["need"] = $need;
 
             $donation = $donationService->register($data);
@@ -45,6 +47,25 @@ class DonationController extends APIController
         } catch (UnprocessableEntityHttpException $exception) {
 
             return $this->respondValidationFail($exception->getMessage());
+        } catch (\Exception $exception) {
+
+            return $this->respondBadRequestError($exception->getMessage());
+        }
+    }
+
+    /**
+     * @Route("/api/v1/donations/{uuid}", methods={"GET"})
+     */
+    public function getDonation($uuid, DonationServiceInterface $donationService)
+    {
+        try {
+            $user = $this->getUser();
+            $donation = $donationService->getDonationByIdAndUserOrFail($uuid, $user->getId());
+
+            return $this->respondSuccess($donation);
+        } catch (NotFoundHttpException $exception) {
+
+            return $this->respondNotFoundError($exception->getMessage());
         } catch (\Exception $exception) {
 
             return $this->respondBadRequestError($exception->getMessage());

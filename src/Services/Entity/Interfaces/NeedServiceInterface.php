@@ -12,7 +12,9 @@ interface NeedServiceInterface
 
     public function update(array $data, array $user): void;
 
-    public function getNeedByIdOrFail(array $data): array;
+    public function getNeedByIdOrFail(string $need_id): array;
+
+    public function getOneByIdAndUserOrFail(string $need_id, string $user_id): array;
 
     public function remove(string $need_id, string $user_id): void;
 
@@ -31,4 +33,6 @@ interface NeedServiceInterface
     public function getAllNeedsNotCanceled(): array;
 
     public function removeDonationCanceled(string $need_id);
+
+    public function getDonationId(): ?string;
 }

@@ -11,4 +11,6 @@ interface DonationInterface extends ModelInterface
     public function confirm(): void;
 
     public function getResumeToNeed(): array;
+
+    public function getStatusUpdateToIndex(): array;
 }

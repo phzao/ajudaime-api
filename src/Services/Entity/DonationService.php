@@ -8,10 +8,8 @@ use App\Services\Entity\Interfaces\DonationServiceInterface;
 use App\Services\Validation\ValidateModelInterface;
 use App\Utils\ElasticSearch\ElasticSearchQueriesInterface;
 use App\Utils\Enums\GeneralTypes;
-use App\Utils\HandleErrors\ErrorMessage;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
-use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
 
 final class DonationService implements DonationServiceInterface
 {
@@ -79,17 +77,11 @@ final class DonationService implements DonationServiceInterface
         return $this->donation->getOriginalData();
     }
 
-    public function ifExistADonationWithThisNeedMustFail(array $data, string $user_id)
+    public function ifExistADonationWithThisNeedMustFail(string $need_id, string $user_id)
     {
-        if (empty($data["need"])) {
-            $msg = ErrorMessage::getArrayMessageToJson(["need"=>"É necessário uma lista p/ continuar!"]);
-
-            throw new UnprocessableEntityHttpException($msg);
-        }
-
         $match = [
             "user.id" => $user_id,
-            "need.id" => $data["need"],
+            "need.id" => $need_id,
             "status" => GeneralTypes::STATUS_PROCESSING
         ];
 
@@ -110,6 +102,51 @@ final class DonationService implements DonationServiceInterface
         if (count($donations["results"]) >= 3) {
             throw new BadRequestHttpException("Quantidade limite de $allowed_number listas em aberto atingida!");
         }
+    }
+
+    public function getDonationByIdAndUserOrFail(string $donation_id, string $user_id): array
+    {
+        $match = [
+            "id" => $donation_id,
+            "user.id" => $user_id
+        ];
+
+        $query = $this->elasticQueries->getBoolMustMatchBy($this->donationIndex, $match);
+        $query["size"] = 1;
+
+        if (!empty($fields)) {
+            $query["_source"] = $fields;
+        }
+
+        $res = $this->repository->search($query);
+
+        if (empty($res["results"])) {
+            throw new NotFoundHttpException("Doação não encontrada");
+        }
+
+        return $res["results"][0];
+    }
+
+    public function getDonationByIdOrFail(string $donation_id): array
+    {
+        $match = [
+            "id" => $donation_id
+        ];
+
+        $query = $this->elasticQueries->getBoolMustMatchBy($this->donationIndex, $match);
+        $query["size"] = 1;
+
+        if (!empty($fields)) {
+            $query["_source"] = $fields;
+        }
+
+        $res = $this->repository->search($query);
+
+        if (empty($res["results"])) {
+            throw new NotFoundHttpException("Doação não encontrada");
+        }
+
+        return $res["results"][0];
     }
 
     public function getDonationOnProcessingByIdOrFail(string $transaction_id, array $fields): array
@@ -202,13 +239,35 @@ final class DonationService implements DonationServiceInterface
         return $this->donation->getResumeToNeed();
     }
 
-    public function cancelDonation(string $user_id, string $donation_id): array
+    public function cancelDonation(string $user_id, $donation_id): array
     {
+        if (empty($donation_id)) {
+            return [];
+        }
+
         $donationSaved = $this->getOneByIdUserIdProcessingOrFail($user_id, $donation_id);
         $this->donation->setAttributes($donationSaved);
         $this->donation->cancel();
 
-        $donationUpdated = $this->donation->getFullDataToUpdateIndex();
+        $donationUpdated = $this->donation->getStatusUpdateToIndex();
+        $this->repository->update($donationUpdated);
+
+        return $this->donation->getResumeToNeed();
+    }
+
+    public function cancelDonationById($donation_id): array
+    {
+        if (empty($donation_id)) {
+            return [];
+        }
+
+        $donationSaved = $this->getDonationByIdOrFail($donation_id);
+
+        $this->donation->setAttributes($donationSaved);
+        $this->donation->cancel();
+
+        $donationUpdated = $this->donation->getStatusUpdateToIndex();
+
         $this->repository->update($donationUpdated);
 
         return $this->donation->getResumeToNeed();

@@ -102,6 +102,18 @@ class Donation implements DonationInterface
         ];
     }
 
+    public function getStatusUpdateToIndex(): array
+    {
+        return [
+            'index' => $this->getIndexName(),
+            'id'    => $this->id,
+            'type'  => '_doc',
+            'body'  => [
+                "doc" => ["status" => $this->status]
+            ]
+        ];
+    }
+
     public function getElasticSearchMapping(): array
     {
         return [

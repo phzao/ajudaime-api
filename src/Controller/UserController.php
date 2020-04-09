@@ -51,6 +51,37 @@ class UserController extends APIController
     }
 
     /**
+     * @Route("/confirm", methods={"PUT"})
+     */
+    public function confirmPosition(Request $request,
+                                    ValidateModelInterface $validateModel,
+                                    ElasticSearchRepositoryInterface $repository)
+    {
+        try {
+            $data = $request->request->all();
+
+            $user = $this->getUser();
+            $user->confirmLocalization($data);
+
+            $validateModel->entityIsValidOrFail($user);
+
+            $userUpdated = $user->getFullDataToUpdateIndex();
+            $repository->update($userUpdated);
+
+            return $this->respondUpdatedResource();
+        } catch (UnprocessableEntityHttpException $exception) {
+
+            return $this->respondValidationFail($exception->getMessage());
+        }  catch (NotFoundHttpException $exception) {
+
+            return $this->respondNotFoundError($exception->getMessage());
+        } catch (\Exception $exception) {
+
+            return $this->respondBadRequestError($exception->getMessage());
+        }
+    }
+
+    /**
      * @Route("", methods={"GET"})
      */
     public function showMe()

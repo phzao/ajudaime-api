@@ -24,4 +24,6 @@ interface UsuarioInterface extends UserInterface
     public function getDataResume(): array;
 
     public function getFieldsAllowedUpdate(): array;
+
+    public function confirmLocalization(array $data): void;
 }

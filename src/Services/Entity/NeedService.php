@@ -8,10 +8,8 @@ use App\Services\Entity\Interfaces\NeedServiceInterface;
 use App\Services\Validation\ValidateModelInterface;
 use App\Utils\ElasticSearch\ElasticSearchQueriesInterface;
 use App\Utils\Enums\GeneralTypes;
-use App\Utils\HandleErrors\ErrorMessage;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
-use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
 
 final class NeedService implements NeedServiceInterface
 {
@@ -26,6 +24,8 @@ final class NeedService implements NeedServiceInterface
     private $needIndex;
 
     private $validation;
+
+    private $donation;
 
     public function __construct(ElasticSearchRepositoryInterface $elasticSearchRepository,
                                 ElasticSearchQueriesInterface $elasticSearchQueries,
@@ -88,16 +88,11 @@ final class NeedService implements NeedServiceInterface
         }
     }
 
-    public function getNeedByIdOrFail(array $data): array
+    public function getNeedByIdOrFail(string $need_id): array
     {
-        if (empty($data["need"])) {
-            $msg = ErrorMessage::getArrayMessageToJson(["need"=>"É necessário uma lista p/ continuar!"]);
-
-            throw new UnprocessableEntityHttpException($msg);
-        }
         $match = [
             "index" => $this->needIndex,
-            "id" => $data["need"]
+            "id" => $need_id
         ];
 
         $need = $this->repository->get($match);
@@ -170,6 +165,10 @@ final class NeedService implements NeedServiceInterface
             "id" => $need_id
         ];
 
+        if (!empty($res["results"][0]["donation"])) {
+            $this->donation = $res["results"][0]["donation"]["id"];
+        }
+
         $this->repository->delete($match);
     }
 
@@ -200,6 +199,23 @@ final class NeedService implements NeedServiceInterface
         $needUpdated = $this->loadNeedToDisable($need_id, ["donation" => $donation]);
 
         $this->repository->update($needUpdated);
+    }
+
+    public function getOneByIdAndUserOrFail(string $need_id, string $user_id): array
+    {
+        $match = [
+            "id" => $need_id,
+            "user.id" => $user_id
+        ];
+
+        $query = $this->elasticQueries->getBoolMustMatchBy($this->needIndex, $match);
+        $res = $this->repository->search($query);
+
+        if (empty($res["results"])) {
+            throw new NotFoundHttpException("Lista não localizada");
+        }
+
+        return $res["results"][0];
     }
 
     public function getNeedsListByUser(string $user_id): array
@@ -267,5 +283,10 @@ final class NeedService implements NeedServiceInterface
         $this->need->setAttributes($needSaved);
         $needUpdated = $this->need->getFullDataToUpdateIndex();
         $this->repository->update($needUpdated);
+    }
+
+    public function getDonationId():?string
+    {
+        return $this->donation;
     }
 }

@@ -370,4 +370,12 @@ class User implements UsuarioInterface, ModelInterface, SimpleTimeInterface
             "localization"
         ];
     }
+
+    public function confirmLocalization(array $data): void
+    {
+        if (!empty($data["localization"])) {
+            $this->localization = $data["localization"];
+            $this->isConfirmedLocalization = true;
+        }
+    }
 }
