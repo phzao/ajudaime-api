@@ -153,21 +153,7 @@ class ApiToken implements ApiTokenInterface
     {
         return [
             "index" => $this->getIndexName(),
-            "body" => [
-                "token" => $this->token,
-                "user" => $this->user,
-                "created_at" => $this->created_at,
-                "expire_at" => $this->expire_at,
-                "expired_at" => $this->expired_at,
-                "device_type" => $this->device_type,
-                "device_brand" => $this->device_brand,
-                "user_agent" => $this->user_agent,
-                "localization" => $this->localization,
-                "city" => $this->city,
-                "state" => $this->state,
-                "postal" => $this->postal,
-                "country" => $this->country
-            ]
+            "body" => $this->getOriginalData()
         ];
     }
 
@@ -192,9 +178,9 @@ class ApiToken implements ApiTokenInterface
             "id" => $this->id,
             "token" => $this->token,
             "user" => $this->user,
-            "created_at" => $this->created_at,
-            "expire_at" => $this->expire_at,
-            "expired_at" => $this->expired_at,
+            "created_at" => $this->getDateTimeStringFrom('created_at'),
+            "expire_at" => $this->getDateTimeStringFrom('expire_at'),
+            "expired_at" =>$this->getDateTimeStringFrom('expired_at'),
             "device_type" => $this->device_type,
             "device_brand" => $this->device_brand,
             "user_agent" => $this->user_agent,

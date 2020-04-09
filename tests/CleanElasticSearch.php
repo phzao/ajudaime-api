@@ -9,6 +9,8 @@ use App\Repository\ElasticSearch\ElasticSearchRepository;
  */
 trait CleanElasticSearch
 {
+    protected $elasticRepository;
+
     protected $indexes = [
         ["index" => "api_tokens_test"],
         ["index" => "donations_test"],

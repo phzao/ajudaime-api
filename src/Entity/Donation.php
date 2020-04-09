@@ -82,11 +82,11 @@ class Donation implements DonationInterface
             "user" => $this->user,
             "status" => $this->status,
             "need" => $this->need,
-            "created_at" => $this->created_at,
-            "updated_at" => $this->updated_at,
-            "canceled_at" => $this->canceled_at,
-            "done_at" => $this->done_at,
-            "need_confirmed_at" => $this->need_confirmed_at
+            "created_at" => $this->getDateTimeStringFrom('created_at'),
+            "updated_at" => $this->getDateTimeStringFrom('updated_at'),
+            "canceled_at" => $this->getDateTimeStringFrom('canceled_at'),
+            "done_at" => $this->getDateTimeStringFrom('done_at'),
+            "need_confirmed_at" => $this->getDateTimeStringFrom('need_confirmed_at')
         ];
     }
 
@@ -178,7 +178,7 @@ class Donation implements DonationInterface
         return [
             "id" => $this->id,
             "status" => $this->status,
-            "created_at" => $this->created_at
+            "created_at" => $this->getDateTimeStringFrom('created_at')
         ];
     }
 }

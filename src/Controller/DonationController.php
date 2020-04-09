@@ -41,9 +41,9 @@ class DonationController extends APIController
 
             return $this->respondCreated($donation);
 
-        } catch (UnauthorizedHttpException $exception) {
+        } catch (NotFoundHttpException $exception) {
 
-            return $this->respondForbiddenFail($exception->getMessage());
+            return $this->respondNotFoundError($exception->getMessage());
         } catch (UnprocessableEntityHttpException $exception) {
 
             return $this->respondValidationFail($exception->getMessage());

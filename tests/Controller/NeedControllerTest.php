@@ -18,10 +18,7 @@ class NeedControllerTest extends WebTestCase
      */
     private $client;
 
-    protected $elasticRepository;
-
     const NEED_ROUTE = "/api/v1/needs";
-
     const DONATION_ROUTE = "/api/v1/donations";
 
     public function setUp()

@@ -48,7 +48,7 @@ final class DonationService implements DonationServiceInterface
     public function getDonationsListProcessingByUser(string $user_id, $result_quantity = 1): array
     {
         $match = [
-            "user" => $user_id,
+            "user.id" => $user_id,
             "status" => GeneralTypes::STATUS_PROCESSING
         ];
 

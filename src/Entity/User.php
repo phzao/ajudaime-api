@@ -225,9 +225,9 @@ class User implements UsuarioInterface, ModelInterface, SimpleTimeInterface
             "phone" => $this->phone,
             "whatsapp" => $this->whatsapp,
             "message" => $this->message,
-            "created_at" => $this->created_at,
-            "updated_at" => $this->updated_at,
-            "deleted_at" => $this->deleted_at
+            "created_at" => $this->getDateTimeStringFrom('created_at'),
+            "updated_at" => $this->getDateTimeStringFrom('updated_at'),
+            "deleted_at" => $this->getDateTimeStringFrom('deleted_at')
         ];
 
         return $data;

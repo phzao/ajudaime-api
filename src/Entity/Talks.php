@@ -89,9 +89,9 @@ class Talks implements TalkInterface
             "origin" => $this->origin,
             "donation" => $this->donation,
             "status" => $this->status,
-            "created_at" => $this->created_at,
+            "created_at" => $this->getDateTimeStringFrom('created_at'),
             "message" => $this->message,
-            "read_at" => $this->read_at
+            "read_at" => $this->getDateTimeStringFrom('read_at')
         ];
     }
 

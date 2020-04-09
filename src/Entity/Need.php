@@ -108,8 +108,8 @@ class Need implements NeedInterface
             "donation" => $this->donation,
             "message" => $this->message,
             "needsList" => $this->needsList,
-            "created_at" => $this->created_at,
-            "updated_at" => $this->updated_at
+            "created_at" => $this->getDateTimeStringFrom('created_at'),
+            "updated_at" => $this->getDateTimeStringFrom('updated_at')
         ];
     }
 
