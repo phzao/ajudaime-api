@@ -31,17 +31,9 @@ trait ModelBase
         $this->$key = $value;
     }
 
-    /**
-     * @throws \Exception
-     */
-    public function updateLastUpdated(): void
-    {
-        $this->updated_at = new \DateTime('now');
-    }
-
     public function remove(): void
     {
-        $this->deleted_at = new \DateTime('now');
+        $this->deleted_at = new \DateTime();
     }
 
     public function getDeletedAt(): ?\DateTime

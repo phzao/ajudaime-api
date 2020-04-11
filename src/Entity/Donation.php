@@ -92,6 +92,7 @@ class Donation implements DonationInterface
 
     public function getFullDataToUpdateIndex(): array
     {
+        $this->updated();
         return [
             'index' => $this->getIndexName(),
             'id'    => $this->id,
@@ -104,6 +105,7 @@ class Donation implements DonationInterface
 
     public function getStatusUpdateToIndex(): array
     {
+        $this->updated();
         return [
             'index' => $this->getIndexName(),
             'id'    => $this->id,
@@ -160,17 +162,20 @@ class Donation implements DonationInterface
     {
         $this->done_at = new \DateTime();
         $this->status = GeneralTypes::STATUS_DONE;
+        $this->updated_at = new \DateTime();
     }
 
     public function cancel(): void
     {
         $this->canceled_at = new \DateTime();
         $this->status = GeneralTypes::STATUS_CANCELED;
+        $this->updated_at = new \DateTime();
     }
 
     public function confirm(): void
     {
         $this->need_confirmed_at = new \DateTime();
+        $this->done();
     }
 
     public function getResumeToNeed(): array

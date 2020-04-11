@@ -115,6 +115,7 @@ class Need implements NeedInterface
 
     public function getFullDataToUpdateIndex(): array
     {
+        $this->updated();
         return [
             'index' => $this->getIndexName(),
             'id'    => $this->id,

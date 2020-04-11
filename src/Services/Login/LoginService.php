@@ -85,10 +85,6 @@ final class LoginService implements LoginServiceInterface
             return $token;
         }
 
-        if (!empty($data["geolocalization"])) {
-            $data = $data["geolocalization"];
-        }
-
         $apiToken = $this->apiTokenService->registerAndGetApiTokenTo($user["id"], $data);
 
         return $apiToken;

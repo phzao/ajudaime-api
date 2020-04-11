@@ -20,6 +20,11 @@ trait SimpleTime
         return $this->$column->format($format);
     }
 
+    public function updated(): void
+    {
+        $this->updated_at = new \DateTime();
+    }
+
     public function getAllAttributesDateAndFormat(): array
     {
         return [

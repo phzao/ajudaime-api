@@ -103,6 +103,12 @@ class User implements UsuarioInterface, ModelInterface, SimpleTimeInterface
      */
     protected $created_at;
 
+    protected $city;
+
+    protected $country;
+
+    protected $state;
+
     protected $attributes = [
         "id",
         "email",
@@ -111,6 +117,9 @@ class User implements UsuarioInterface, ModelInterface, SimpleTimeInterface
         "status",
         "whatsapp",
         "message",
+        "country",
+        "city",
+        "state",
         "localization",
         "apiToken",
         "isConfirmedLocalization",
@@ -199,6 +208,9 @@ class User implements UsuarioInterface, ModelInterface, SimpleTimeInterface
             "isConfirmedLocalization" => $this->isConfirmedLocalization,
             "message" => $this->message,
             "localization" => $this->localization,
+            "city" => $this->city,
+            "country" => $this->country,
+            "state" => $this->state,
             "status" => $this->status,
             "status_description" => GeneralTypes::getDefaultDescription($this->status),
             "created_at" => $this->getDateTimeStringFrom('created_at'),
@@ -223,6 +235,9 @@ class User implements UsuarioInterface, ModelInterface, SimpleTimeInterface
             "localization" => $this->localization,
             "isConfirmedLocalization" => $this->isConfirmedLocalization,
             "phone" => $this->phone,
+            "city" => $this->city,
+            "country" => $this->country,
+            "state" => $this->state,
             "whatsapp" => $this->whatsapp,
             "message" => $this->message,
             "created_at" => $this->getDateTimeStringFrom('created_at'),
@@ -232,6 +247,8 @@ class User implements UsuarioInterface, ModelInterface, SimpleTimeInterface
 
         return $data;
     }
+
+
 
     public function setDisable()
     {
@@ -300,6 +317,9 @@ class User implements UsuarioInterface, ModelInterface, SimpleTimeInterface
                         "status" => ["type" => "text"],
                         "email" => ["type" => "keyword"],
                         "name" => ["type" => "text"],
+                        "city" => ["type" => "text"],
+                        "state" => ["type" => "text"],
+                        "country" => ["type" => "text"],
                         "isConfirmedLocalization" => ["type" => "boolean"],
                         "message" => ["type" => "text", "null_value" => "NULL"],
                         "localization" => ["type" => "geo_point"],
@@ -334,6 +354,7 @@ class User implements UsuarioInterface, ModelInterface, SimpleTimeInterface
 
     public function getFullDataToUpdateIndex(): array
     {
+        $this->updated();
         return [
             'index' => $this->getIndexName(),
             'id'    => $this->id,
@@ -357,7 +378,10 @@ class User implements UsuarioInterface, ModelInterface, SimpleTimeInterface
             "id" => $this->id,
             "name" => $this->name,
             "message" => $this->message,
-            "localization" => $this->localization
+            "localization" => $this->localization,
+            "state" => $this->state,
+            "city" => $this->city,
+            "country" => $this->country
         ];
     }
 
@@ -376,6 +400,17 @@ class User implements UsuarioInterface, ModelInterface, SimpleTimeInterface
         if (!empty($data["localization"])) {
             $this->localization = $data["localization"];
             $this->isConfirmedLocalization = true;
+        }
+    }
+
+    public function fixStateIfNeeded(): void
+    {
+        if (strpos($this->state, '-') !== false) {
+            $state = explode("-", $this->state);
+
+            if (count($state) >=2) {
+                $this->state = $state[1];
+            }
         }
     }
 }

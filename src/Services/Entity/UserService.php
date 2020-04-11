@@ -85,6 +85,7 @@ final class UserService implements UserServiceInterface
         }
 
         $this->user->setAttributes($data);
+        $this->user->fixStateIfNeeded();
 
         $this->validationModel->entityIsValidOrFail($this->user);
 

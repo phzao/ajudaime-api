@@ -33,7 +33,6 @@ class RegisterController extends APIController
 
             $loginData = $loginService->getTokenCreateIfNotExist($user, $data);
 
-
             $loginData["user"] = $user;
 
             return $this->respondSuccess($loginData);

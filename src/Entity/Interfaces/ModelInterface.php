@@ -17,7 +17,7 @@ interface ModelInterface
 
     public function getId(): ?string;
 
-    public function updateLastUpdated(): void;
+    public function updated(): void;
 
     public function remove(): void;
 
