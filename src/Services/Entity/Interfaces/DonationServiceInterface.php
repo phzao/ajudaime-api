@@ -20,9 +20,9 @@ interface DonationServiceInterface
 
     public function cancelDonationById($donation_id): array;
 
-    public function doneDonation(string $user_id, string $donation_id): array;
+    public function doneDonation(string $user_id, string $donation_id): string;
 
-    public function needConfirmation(string $user_id, string $donation_id): array;
+    public function needConfirmation(string $user_id, string $donation_id): string;
 
     public function getDonationsByUser(string $user_id): array;
 

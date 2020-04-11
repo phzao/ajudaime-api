@@ -54,6 +54,25 @@ class DonationController extends APIController
     }
 
     /**
+     * @Route("/api/v1/donations", methods={"GET"})
+     */
+    public function listByUser(DonationServiceInterface $donationService)
+    {
+        try {
+            $user = $this->getUser();
+            $list = $donationService->getDonationsByUser($user->getId());
+
+            return $this->respondSuccess($list);
+        } catch (NotFoundHttpException $exception) {
+
+            return $this->respondNotFoundError($exception->getMessage());
+        } catch (\Exception $exception) {
+
+            return $this->respondBadRequestError($exception->getMessage());
+        }
+    }
+
+    /**
      * @Route("/api/v1/donations/{uuid}", methods={"GET"})
      */
     public function getDonation($uuid, DonationServiceInterface $donationService)
@@ -110,11 +129,12 @@ class DonationController extends APIController
     {
         try {
             $user = $this->getUser();
-            $donation = $donationService->doneDonation($user->getId(), $uuid);
+            $needId = $donationService->doneDonation($user->getId(), $uuid);
+            $need = $needService->getOneByIdOrFail($needId);
 
-            $needService->setNeedDone($donation["need"]["id"],
-                                      $donationService->getDonationStatusIdCreated());
+            $need["donation"] = $donationService->getDonationStatusIdCreated();
 
+            $needService->updateAnyway($need);
             return $this->respondUpdatedResource();
 
         } catch (UnauthorizedHttpException $exception) {
@@ -133,12 +153,19 @@ class DonationController extends APIController
      * @Route("/api/v1/donations/{uuid}/confirm", methods={"PUT"})
      * @throws \Exception
      */
-    public function confirm($uuid, DonationServiceInterface $donationService)
+    public function confirm($uuid,
+                            DonationServiceInterface $donationService,
+                            NeedServiceInterface $needService)
     {
         try {
             $user = $this->getUser();
-            $donationService->needConfirmation($user->getId(), $uuid);
+            $needId = $donationService->needConfirmation($user->getId(), $uuid);
 
+            $need = $needService->getOneByIdOrFail($needId);
+
+            $need["donation"] = $donationService->getDonationStatusIdCreated();
+
+            $needService->updateAnyway($need);
             return $this->respondUpdatedResource();
 
         } catch (UnauthorizedHttpException $exception) {

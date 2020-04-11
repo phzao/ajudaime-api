@@ -194,13 +194,6 @@ final class NeedService implements NeedServiceInterface
         $this->repository->update($needUpdated);
     }
 
-    public function setNeedDone(string $need_id, array $donation): void
-    {
-        $needUpdated = $this->loadNeedToDisable($need_id, ["donation" => $donation]);
-
-        $this->repository->update($needUpdated);
-    }
-
     public function getOneByIdAndUserOrFail(string $need_id, string $user_id): array
     {
         $match = [
@@ -232,6 +225,21 @@ final class NeedService implements NeedServiceInterface
         }
 
         return [];
+    }
+
+    public function getOneByIdOrFail(string $id): array
+    {
+        $params = [
+            "index" => $this->needIndex,
+            "id" => $id
+        ];
+
+        $need = $this->repository->get($params);
+        if (empty($need)) {
+            throw new NotFoundHttpException('Ajuda não localizada');
+        }
+
+        return $need;
     }
 
     public function updateAnyway(array $need)

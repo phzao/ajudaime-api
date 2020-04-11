@@ -178,7 +178,17 @@ class Donation implements DonationInterface
         return [
             "id" => $this->id,
             "status" => $this->status,
-            "created_at" => $this->getDateTimeStringFrom('created_at')
+            "created_at" => $this->getDateTimeStringFrom('created_at'),
+            "need_confirmed_at" => $this->getDateTimeStringFrom('need_confirmed_at')
         ];
+    }
+
+    public function getNeedId(): string
+    {
+        if (!$this->need) {
+            return "";
+        }
+
+        return $this->need["id"];
     }
 }

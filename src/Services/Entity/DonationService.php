@@ -179,11 +179,11 @@ final class DonationService implements DonationServiceInterface
         return $transaction[0]["id"];
     }
 
-    public function needConfirmation(string $user_id, string $donation_id): array
+    public function needConfirmation(string $user_id, string $donation_id): string
     {
         $match = [
-            "need.id" => $user_id,
-            "id" => $donation_id
+            "id" => $donation_id,
+            "need.user.id" => $user_id
         ];
 
         $query = $this->elasticQueries->getBoolMustMatchBy($this->donationIndex, $match);
@@ -202,8 +202,9 @@ final class DonationService implements DonationServiceInterface
         $donationUpdated = $this->donation->getFullDataToUpdateIndex();
 
         $this->repository->update($donationUpdated);
+        $this->donationToNeed = $this->donation->getResumeToNeed();
 
-        return $this->donation->getResumeToNeed();
+        return $this->donation->getNeedId();
     }
 
     public function getOneByIdUserIdProcessingOrFail(string $user_id, string $donation_id): array
@@ -226,7 +227,7 @@ final class DonationService implements DonationServiceInterface
         return $res["results"][0];
     }
 
-    public function doneDonation(string $user_id, string $donation_id): array
+    public function doneDonation(string $user_id, string $donation_id): string
     {
         $donationSaved = $this->getOneByIdUserIdProcessingOrFail($user_id, $donation_id);
 
@@ -234,9 +235,12 @@ final class DonationService implements DonationServiceInterface
         $this->donation->done();
 
         $donationUpdated = $this->donation->getFullDataToUpdateIndex();
+
         $this->repository->update($donationUpdated);
 
-        return $this->donation->getResumeToNeed();
+        $this->donationToNeed = $this->donation->getResumeToNeed();
+
+        return $this->donation->getNeedId();
     }
 
     public function cancelDonation(string $user_id, $donation_id): array
@@ -251,6 +255,7 @@ final class DonationService implements DonationServiceInterface
 
         $donationUpdated = $this->donation->getStatusUpdateToIndex();
         $this->repository->update($donationUpdated);
+        $this->donationToNeed = $this->donation->getResumeToNeed();
 
         return $this->donation->getResumeToNeed();
     }
