@@ -30,6 +30,8 @@ interface NeedServiceInterface
 
     public function getAllNeedsNotCanceled(): array;
 
+    public function getAllNeedsNotCanceledByCountryOrFail(array $data): array;
+
     public function removeDonationCanceled(string $need_id);
 
     public function getDonationId(): ?string;

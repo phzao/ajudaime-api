@@ -283,6 +283,24 @@ final class NeedService implements NeedServiceInterface
         return $res["results"];
     }
 
+    public function getAllNeedsNotCanceledByCountryOrFail(array $data): array
+    {
+        if (empty($data["country"])) {
+            throw new BadRequestHttpException("Deve-se informar o País da busca");
+        }
+
+        $match = [
+            "status" => GeneralTypes::STATUS_ENABLE,
+            "user.country" => $data["country"],
+        ];
+
+        $query = $this->elasticQueries->getBoolMustMatchBy($this->needIndex, $match);
+
+        $res = $this->repository->search($query);
+
+        return $res["results"];
+    }
+
     public function removeDonationCanceled(string $need_id)
     {
         $needSaved = $this->getOneByIdAndEnableOrFail($need_id);

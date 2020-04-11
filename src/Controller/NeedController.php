@@ -148,10 +148,13 @@ class NeedController extends APIController
     /**
      * @Route("/public/needs", methods={"GET"})
      */
-    public function listNotCanceled(NeedServiceInterface $needService)
+    public function listNotCanceled(Request $request, NeedServiceInterface $needService)
     {
         try {
-            $list = $needService->getAllNeedsNotCanceled();
+
+            $data = $request->query->all();
+
+            $list = $needService->getAllNeedsNotCanceledByCountryOrFail($data);
 
             return $this->respondSuccess($list);
         } catch (NotFoundHttpException $exception) {

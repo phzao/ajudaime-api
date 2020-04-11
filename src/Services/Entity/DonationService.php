@@ -243,12 +243,8 @@ final class DonationService implements DonationServiceInterface
         return $this->donation->getNeedId();
     }
 
-    public function cancelDonation(string $user_id, $donation_id): array
+    public function cancelDonation(string $user_id, $donation_id): string
     {
-        if (empty($donation_id)) {
-            return [];
-        }
-
         $donationSaved = $this->getOneByIdUserIdProcessingOrFail($user_id, $donation_id);
         $this->donation->setAttributes($donationSaved);
         $this->donation->cancel();
@@ -257,7 +253,7 @@ final class DonationService implements DonationServiceInterface
         $this->repository->update($donationUpdated);
         $this->donationToNeed = $this->donation->getResumeToNeed();
 
-        return $this->donation->getResumeToNeed();
+        return $this->donation->getNeedId();
     }
 
     public function cancelDonationById($donation_id): array

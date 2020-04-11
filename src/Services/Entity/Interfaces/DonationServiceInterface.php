@@ -16,7 +16,7 @@ interface DonationServiceInterface
 
     public function getDonationIdOrFail(string $donation_id): string;
 
-    public function cancelDonation(string $user_id, $donation_id): array;
+    public function cancelDonation(string $user_id, $donation_id): string;
 
     public function cancelDonationById($donation_id): array;
 

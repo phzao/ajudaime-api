@@ -101,9 +101,9 @@ class DonationController extends APIController
     {
         try {
             $user = $this->getUser();
-            $donation = $donationService->cancelDonation($user->getId(), $uuid);
+            $needId = $donationService->cancelDonation($user->getId(), $uuid);
 
-            $needService->removeDonationCanceled($donation["need"]["id"]);
+            $needService->removeDonationCanceled($needId);
 
             return $this->respondUpdatedResource();
 
