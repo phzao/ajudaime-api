@@ -95,6 +95,18 @@ class Talks implements TalkInterface
         ];
     }
 
+    public function getResume(): array
+    {
+        return [
+            "id" => $this->id,
+            "origin" => $this->origin,
+            "status" => $this->status,
+            "created_at" => $this->getDateTimeStringFrom('created_at'),
+            "message" => $this->message,
+            "read_at" => $this->getDateTimeStringFrom('read_at')
+        ];
+    }
+
     public function getFullDataToUpdateIndex(): array
     {
         $this->updated();

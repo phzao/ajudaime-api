@@ -42,6 +42,10 @@ final class TalkService implements TalkServiceInterface
         $this->talkIndex = $talk_index["index"];
     }
 
+    public function getTalkEntity():?TalkInterface
+    {
+        return $this->talk;
+    }
 
     public function register(array $data): ?array
     {

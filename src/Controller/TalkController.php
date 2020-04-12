@@ -26,18 +26,60 @@ class TalkController extends APIController
         try {
             $data = $request->request->all();
             $user = $this->getUser();
-            $donation = $donationService->getDonationIdOrFail($donation_id);
+            $donation = $donationService->getDonationEntityByIdOrFail($donation_id);
 
             $talkService->thisTalkGoesBeyondTheUnreadLimitOfOrFail(5,
                                                                    $user->getId(),
                                                                    $donation_id);
 
-            $data["donation"] = $donation;
+            $data["donation"] = $donation->getResume();
             $data["origin"] = $user->getId();
 
             $talk = $talkService->register($data);
+            $talkEntity = $talkService->getTalkEntity();
+
+            $donation->addTalk($talkEntity->getResume());
+            $donationUpdated = $donation->getFullDataToUpdateIndex();
+
+            $donationService->update($donationUpdated);
 
             return $this->respondCreated($talk);
+
+        } catch (UnauthorizedHttpException $exception) {
+
+            return $this->respondForbiddenFail($exception->getMessage());
+        } catch (UnprocessableEntityHttpException $exception) {
+
+            return $this->respondValidationFail($exception->getMessage());
+        } catch (\Exception $exception) {
+
+            return $this->respondBadRequestError($exception->getMessage());
+        }
+    }
+
+    /**
+     * @Route("/api/v1/talks/open", methods={"GET"})
+     * @throws \Exception
+     */
+    public function talk(Request $request,
+                         DonationServiceInterface $donationService,
+                         TalkServiceInterface $talkService)
+    {
+        try {
+
+//            $user = $this->getUser();
+//            $donation = $donationService->getDonationIdOrFail($donation_id);
+//
+//            $talkService->thisTalkGoesBeyondTheUnreadLimitOfOrFail(5,
+//                                                                   $user->getId(),
+//                                                                   $donation_id);
+//
+//            $data["donation"] = $donation;
+//            $data["origin"] = $user->getId();
+//
+//            $talk = $talkService->register($data);
+
+            return $this->respondSuccess([]);
 
         } catch (UnauthorizedHttpException $exception) {
 

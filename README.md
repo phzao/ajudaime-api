@@ -53,7 +53,8 @@ GET - http://localhost:8888/api/v1/needs/{uuid} -> show details
 PUT - http://localhost:8888/api/v1/donations/{uuid}/done -> did by a helper
 PUT - http://localhost:8888/api/v1/donations/{uuid}/cancel -> did by a helper
 PUT - http://localhost:8888/api/v1/donations/{uuid}/confirm -> did by who needy help
-POST - http://localhost:8888/api/v1/donations
+GET - http://localhost:8888/api/v1/donations/{uuid}/confirm -> did by who needy help
+POST - http://localhost:8888/api/v1/donations/talks -> show donations opened to send/receive message 
 
 POST - http://localhost:8888/api/v1/talks/{donation_id}
 

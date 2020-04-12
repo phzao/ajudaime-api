@@ -25,6 +25,8 @@ class Donation implements DonationInterface
 
     protected $need;
 
+    protected $talks;
+
     /**
      * @var string
      * @Assert\NotBlank(message="The status is required!")
@@ -46,6 +48,7 @@ class Donation implements DonationInterface
         "id",
         "user",
         "need",
+        "talks",
         "created_at"
     ];
 
@@ -82,6 +85,7 @@ class Donation implements DonationInterface
             "user" => $this->user,
             "status" => $this->status,
             "need" => $this->need,
+            "talks" => $this->talks,
             "created_at" => $this->getDateTimeStringFrom('created_at'),
             "updated_at" => $this->getDateTimeStringFrom('updated_at'),
             "canceled_at" => $this->getDateTimeStringFrom('canceled_at'),
@@ -130,6 +134,17 @@ class Donation implements DonationInterface
                                 "name" => ["type" => "text"],
                                 "message" => ["type" => "text", "null_value" => "NULL"],
                                 "localization" => ["type" => "geo_point"],
+                            ]
+                        ],
+                        "talks" => [
+                            "type" => "nested",
+                            "properties" => [
+                                "id" => ["type" => "keyword"],
+                                "origin" => ["type" => "keyword"],
+                                "status" => ["type" => "text"],
+                                "created_at" => ["type" => "date"],
+                                "message" => ["type" => "text"],
+                                "read_at" => ["type" => "date"],
                             ]
                         ],
                         "need" => [
@@ -188,6 +203,11 @@ class Donation implements DonationInterface
         ];
     }
 
+    public function getResume(): array
+    {
+        return $this->getResumeToNeed();
+    }
+
     public function getNeedId(): string
     {
         if (!$this->need) {
@@ -195,5 +215,14 @@ class Donation implements DonationInterface
         }
 
         return $this->need["id"];
+    }
+
+    public function addTalk(array $talk): void
+    {
+        if ($this->talks === "NULL") {
+            $this->talks = [];
+        }
+
+        $this->talks[] = $talk;
     }
 }

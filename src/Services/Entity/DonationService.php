@@ -77,6 +77,11 @@ final class DonationService implements DonationServiceInterface
         return $this->donation->getOriginalData();
     }
 
+    public function update(array $donation): void
+    {
+        $this->repository->update($donation);
+    }
+
     public function ifExistADonationWithThisNeedMustFail(string $need_id, string $user_id)
     {
         $match = [
@@ -125,6 +130,24 @@ final class DonationService implements DonationServiceInterface
         }
 
         return $res["results"][0];
+    }
+
+    public function getDonationEntityByIdOrFail(string $donation_id): ?DonationInterface
+    {
+        $match = [
+            "index" => $this->donationIndex,
+            "id" => $donation_id
+        ];
+
+        $donation = $this->repository->get($match);
+
+        if (empty($donation)) {
+            throw new NotFoundHttpException("Doação não encontrada");
+        }
+
+        $this->donation->setAttributes($donation);
+
+        return $this->donation;
     }
 
     public function getDonationByIdOrFail(string $donation_id): array
@@ -225,6 +248,27 @@ final class DonationService implements DonationServiceInterface
         }
 
         return $res["results"][0];
+    }
+
+    public function getDonationsToTalk(string $user_id): array
+    {
+        $must = [
+            "need_confirmed_at" => "NULL"
+        ];
+
+        $should = [
+            "user.id" => $user_id,
+            "need.user.id" => $user_id
+        ];
+        $query = $this->elasticQueries->getBoolMustOrShouldBy($this->donationIndex, $must, $should);
+
+        $res = $this->repository->search($query);
+
+        if (!empty($res["results"])) {
+            return $res["results"];
+        }
+
+        return [];
     }
 
     public function doneDonation(string $user_id, string $donation_id): string

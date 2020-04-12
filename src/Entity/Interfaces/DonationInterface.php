@@ -15,4 +15,8 @@ interface DonationInterface extends ModelInterface
     public function getStatusUpdateToIndex(): array;
 
     public function getNeedId(): string;
+
+    public function getResume(): array;
+
+    public function addTalk(array $talk): void;
 }

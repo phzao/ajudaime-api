@@ -19,5 +19,7 @@ interface ElasticSearchQueriesInterface
 
     public function getBoolMustNotMatchBy(string $index, array $params): array;
 
+    public function getBoolMustOrShouldBy(string $index, array $must, array $should): array;
+
     public function getBoolMustMatchMustNotBy(string $index, array $mustMatch, array $mustNot): array;
 }

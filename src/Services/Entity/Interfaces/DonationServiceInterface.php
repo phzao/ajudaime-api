@@ -2,6 +2,8 @@
 
 namespace App\Services\Entity\Interfaces;
 
+use App\Entity\Interfaces\DonationInterface;
+
 interface DonationServiceInterface
 {
     public function getDonationsListProcessingByUser(string $user_id, $result_quantity = 3): array;
@@ -35,4 +37,10 @@ interface DonationServiceInterface
     public function getDonationStatusIdCreated(): array;
 
     public function getOneByIdUserIdProcessingOrFail(string $user_id, string $donation_id): array;
+
+    public function getDonationsToTalk(string $User_id): array;
+
+    public function getDonationEntityByIdOrFail(string $donation_id): ?DonationInterface;
+
+    public function update(array $donation): void;
 }

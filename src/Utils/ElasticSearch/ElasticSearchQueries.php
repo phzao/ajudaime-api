@@ -104,6 +104,38 @@ class ElasticSearchQueries implements ElasticSearchQueriesInterface
         return $body;
     }
 
+    public function getBoolMustOrShouldBy(string $index, array $must, array $should): array
+    {
+        $matchData = [];
+
+        foreach ($must as $key => $param)
+        {
+            $matchData[] = ["match" => [$key => $param]];
+        }
+
+        $shouldData = [];
+
+        foreach ($should as $key => $param)
+        {
+            $shouldData[] = ["match" => [$key => $param]];
+        }
+
+        $body = $this->getBodyData($index);
+
+        $matchData[] = [
+            "bool"=>
+                ["should" => $shouldData]
+        ];
+        $body["body"] = [
+            "query" => [
+                "bool" =>
+                    ["must" => $matchData],
+            ]
+        ];
+
+        return $body;
+    }
+
     public function getBoolMustMatchMustNotBy(string $index,
                                               array $mustMatch,
                                               array $mustNot): array

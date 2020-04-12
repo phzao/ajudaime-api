@@ -11,6 +11,7 @@ services:
       ports:
         - "8888:8888"
         - "443:443"
+        - "8088:8088"
       networks:
         - ajudaime-net
 

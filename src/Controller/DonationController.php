@@ -54,6 +54,30 @@ class DonationController extends APIController
     }
 
     /**
+     * @Route("/api/v1/donations/talks", methods={"GET"})
+     * @throws \Exception
+     */
+    public function donationsToTalk(DonationServiceInterface $donationService)
+    {
+        try {
+            $user = $this->getUser();
+            $list = $donationService->getDonationsToTalk($user->getId());
+
+            return $this->respondSuccess($list);
+
+        } catch (UnauthorizedHttpException $exception) {
+
+            return $this->respondForbiddenFail($exception->getMessage());
+        } catch (UnprocessableEntityHttpException $exception) {
+
+            return $this->respondValidationFail($exception->getMessage());
+        } catch (\Exception $exception) {
+
+            return $this->respondBadRequestError($exception->getMessage());
+        }
+    }
+
+    /**
      * @Route("/api/v1/donations", methods={"GET"})
      */
     public function listByUser(DonationServiceInterface $donationService)
