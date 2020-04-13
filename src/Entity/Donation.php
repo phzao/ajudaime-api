@@ -225,4 +225,10 @@ class Donation implements DonationInterface
 
         $this->talks[] = $talk;
     }
+
+    public function updateTalk(array $talk): void
+    {
+        $key = array_search($talk["id"], array_column($this->talks, 'id'));
+        $this->talks[$key] = $talk;
+    }
 }

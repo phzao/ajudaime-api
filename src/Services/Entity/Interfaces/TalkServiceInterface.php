@@ -11,4 +11,6 @@ interface TalkServiceInterface
     public function register(array $data): ?array;
 
     public function getTalkEntity():?TalkInterface;
+
+    public function setTalkRead(string $talk_id): array;
 }

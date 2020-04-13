@@ -9,6 +9,7 @@ use App\Services\Validation\ValidateModelInterface;
 use App\Utils\ElasticSearch\ElasticSearchQueriesInterface;
 use App\Utils\Enums\GeneralTypes;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 final class TalkService implements TalkServiceInterface
 {
@@ -40,6 +41,35 @@ final class TalkService implements TalkServiceInterface
         }
 
         $this->talkIndex = $talk_index["index"];
+    }
+
+    public function setTalkRead(string $talk_id): array
+    {
+        $talk = $this->getTalkEntityByIdOrFail($talk_id);
+        $talk->setRead();
+        $talkUpdated = $talk->getFullDataToUpdateIndex();
+
+        $this->repository->update($talkUpdated);
+
+        return $talk->getOriginalData();
+    }
+
+    public function getTalkEntityByIdOrFail(string $talk_id): ?TalkInterface
+    {
+        $match = [
+            "index" => $this->talkIndex,
+            "id" => $talk_id
+        ];
+
+        $talk = $this->repository->get($match);
+
+        if (empty($talk)) {
+            throw new NotFoundHttpException("Mensagem não encontrada");
+        }
+
+        $this->talk->setAttributes($talk);
+
+        return $this->talk;
     }
 
     public function getTalkEntity():?TalkInterface

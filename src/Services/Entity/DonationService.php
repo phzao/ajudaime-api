@@ -356,4 +356,13 @@ final class DonationService implements DonationServiceInterface
     {
         return $this->donationToNeed;
     }
+
+    public function updateTalk(array $talk): void
+    {
+        $donation = $this->getDonationEntityByIdOrFail($talk["donation"]["id"]);
+        unset($talk["donation"]);
+        $donation->updateTalk($talk);
+        $donationUpdated = $donation->getFullDataToUpdateIndex();
+        $this->repository->update($donationUpdated);
+    }
 }

@@ -19,4 +19,6 @@ interface DonationInterface extends ModelInterface
     public function getResume(): array;
 
     public function addTalk(array $talk): void;
+
+    public function updateTalk(array $talk): void;
 }

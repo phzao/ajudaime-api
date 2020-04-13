@@ -43,4 +43,6 @@ interface DonationServiceInterface
     public function getDonationEntityByIdOrFail(string $donation_id): ?DonationInterface;
 
     public function update(array $donation): void;
+
+    public function updateTalk(array $talk): void;
 }

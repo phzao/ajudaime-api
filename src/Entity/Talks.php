@@ -147,4 +147,9 @@ class Talks implements TalkInterface
             "body" => $this->getOriginalData()
         ];
     }
+
+    public function setRead():void
+    {
+        $this->read_at = new \DateTime();
+    }
 }

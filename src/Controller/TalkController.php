@@ -58,14 +58,17 @@ class TalkController extends APIController
     }
 
     /**
-     * @Route("/api/v1/talks/open", methods={"GET"})
+     * @Route("/api/v1/talks/{uuid}/read", methods={"PUT"})
      * @throws \Exception
      */
     public function talk(Request $request,
+                         $uuid,
                          DonationServiceInterface $donationService,
                          TalkServiceInterface $talkService)
     {
         try {
+                $talk = $talkService->setTalkRead($uuid);
+                $donationService->updateTalk($talk);
 
 //            $user = $this->getUser();
 //            $donation = $donationService->getDonationIdOrFail($donation_id);
@@ -79,7 +82,7 @@ class TalkController extends APIController
 //
 //            $talk = $talkService->register($data);
 
-            return $this->respondSuccess([]);
+            return $this->respondUpdatedResource();
 
         } catch (UnauthorizedHttpException $exception) {
 
