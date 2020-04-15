@@ -43,23 +43,8 @@ final class NeedService implements NeedServiceInterface
             $this->repository->index($mapping);
         }
 
+        $this->elasticQueries->setIndex($need_index["index"]);
         $this->needIndex = $need_index["index"];
-    }
-
-    public function getNeedsListUnblockedByUser(string $user_id, $result_quantity = 1): array
-    {
-        $match = [
-            "user.id" => $user_id,
-        ];
-
-        $notMatch = [
-            "status" => GeneralTypes::STATUS_DISABLE
-        ];
-
-        $query = $this->elasticQueries->getBoolMustMatchMustNotBy($this->needIndex, $match, $notMatch);
-        $query["size"] = $result_quantity;
-
-        return $this->repository->search($query);
     }
 
     public function register(array $data): ?array
@@ -81,7 +66,17 @@ final class NeedService implements NeedServiceInterface
 
     public function thisNeedGoesBeyondTheOpensLimitOfOrFail(int $allowed_number, string $user_id)
     {
-        $needs = $this->getNeedsListUnblockedByUser($user_id, self::ROWS_ALLOWED);
+        $match = [
+            "user.id" => $user_id
+        ];
+
+        $should = [
+            "donation.need_confirmed_at" => "NULL"
+        ];
+
+        $query = $this->elasticQueries->getMustAndMustNotExist($match, "donation", $should);
+
+        $needs = $this->repository->search($query);
 
         if (count($needs["results"]) >= $allowed_number) {
             throw new BadRequestHttpException("Quantidade limite de $allowed_number listas em aberto atingida!");

@@ -61,26 +61,13 @@ class TalkController extends APIController
      * @Route("/api/v1/talks/{uuid}/read", methods={"PUT"})
      * @throws \Exception
      */
-    public function talk(Request $request,
-                         $uuid,
+    public function talk($uuid,
                          DonationServiceInterface $donationService,
                          TalkServiceInterface $talkService)
     {
         try {
                 $talk = $talkService->setTalkRead($uuid);
                 $donationService->updateTalk($talk);
-
-//            $user = $this->getUser();
-//            $donation = $donationService->getDonationIdOrFail($donation_id);
-//
-//            $talkService->thisTalkGoesBeyondTheUnreadLimitOfOrFail(5,
-//                                                                   $user->getId(),
-//                                                                   $donation_id);
-//
-//            $data["donation"] = $donation;
-//            $data["origin"] = $user->getId();
-//
-//            $talk = $talkService->register($data);
 
             return $this->respondUpdatedResource();
 

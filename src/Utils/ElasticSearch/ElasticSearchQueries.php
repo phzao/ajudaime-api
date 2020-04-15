@@ -7,6 +7,13 @@ namespace App\Utils\ElasticSearch;
  */
 class ElasticSearchQueries implements ElasticSearchQueriesInterface
 {
+    private $index;
+
+    public function setIndex(string $index): void
+    {
+        $this->index = $index;
+    }
+
     public function getQueryExactBy(string $index,
                                     string $column,
                                     string $value): array
@@ -15,7 +22,7 @@ class ElasticSearchQueries implements ElasticSearchQueriesInterface
 
         $body["body"] = [
             "query" => [
-                "match_phrase_prefix" => [ $column => $value]
+                "match_phrase_prefix" => [$column => $value]
             ]
         ];
 
@@ -29,12 +36,12 @@ class ElasticSearchQueries implements ElasticSearchQueriesInterface
         $body = $this->getBodyData($index);
 
         $body["body"] = [
-                "query" => [
-                    "simple_query_string" => [
-                        "query"  => $query,
-                        "fields" => [$field]
-                    ]
+            "query" => [
+                "simple_query_string" => [
+                    "query"  => $query,
+                    "fields" => [$field]
                 ]
+            ]
         ];
 
         return $body;
@@ -42,11 +49,11 @@ class ElasticSearchQueries implements ElasticSearchQueriesInterface
 
     public function getMatchSearch(string $index, array $params): array
     {
-        if (count($params)>1) {
+        if (count($params) > 1) {
             return $params;
         }
 
-        $key = array_keys($params);
+        $key   = array_keys($params);
         $value = array_values($params);
 
         $body = $this->getBodyData($index);
@@ -66,8 +73,7 @@ class ElasticSearchQueries implements ElasticSearchQueriesInterface
     {
         $matchData = [];
 
-        foreach($params as $key=>$param)
-        {
+        foreach ($params as $key => $param) {
             $matchData[] = ["match" => [$key => $param]];
         }
 
@@ -76,7 +82,7 @@ class ElasticSearchQueries implements ElasticSearchQueriesInterface
         $body["body"] = [
             "query" => [
                 "bool" =>
-                ["must" => $matchData]
+                    ["must" => $matchData]
             ]
         ];
 
@@ -87,8 +93,7 @@ class ElasticSearchQueries implements ElasticSearchQueriesInterface
     {
         $matchData = [];
 
-        foreach($params as $key=>$param)
-        {
+        foreach ($params as $key => $param) {
             $matchData[] = ["match" => [$key => $param]];
         }
 
@@ -104,26 +109,65 @@ class ElasticSearchQueries implements ElasticSearchQueriesInterface
         return $body;
     }
 
+    public function getMustAndMustNotExist(array $must, string $exist_field, array $should): array
+    {
+        $matchData = [];
+
+        foreach ($must as $key => $param) {
+            $matchData = ["match" => [$key => $param]];
+        }
+
+        $shouldData = [];
+
+        foreach ($should as $key => $param) {
+            $shouldData = ["match" => [$key => $param]];
+        }
+
+        $body = $this->getBodyData($this->index);
+
+        $shouldBody["bool"] = [
+                "should" => [
+                    [
+                        "bool" =>
+                            [
+                                "must_not" => [
+                                    "exists" => ["field" => $exist_field]
+                                ]
+                            ]
+                    ],
+                    [
+                        "bool" =>[
+                            "must" => $shouldData
+                        ]
+                    ]
+                ]
+        ];
+
+        $mustBody["bool"]["must"] = [$matchData, $shouldBody];
+
+        $body["body"]["query"] = $mustBody;
+
+        return $body;
+    }
+
     public function getBoolMustOrShouldBy(string $index, array $must, array $should): array
     {
         $matchData = [];
 
-        foreach ($must as $key => $param)
-        {
+        foreach ($must as $key => $param) {
             $matchData[] = ["match" => [$key => $param]];
         }
 
         $shouldData = [];
 
-        foreach ($should as $key => $param)
-        {
+        foreach ($should as $key => $param) {
             $shouldData[] = ["match" => [$key => $param]];
         }
 
         $body = $this->getBodyData($index);
 
-        $matchData[] = [
-            "bool"=>
+        $matchData[]  = [
+            "bool" =>
                 ["should" => $shouldData]
         ];
         $body["body"] = [
@@ -140,16 +184,14 @@ class ElasticSearchQueries implements ElasticSearchQueriesInterface
                                               array $mustMatch,
                                               array $mustNot): array
     {
-        $matchData = [];
+        $matchData    = [];
         $notMatchData = [];
 
-        foreach($mustMatch as $key=>$param)
-        {
+        foreach ($mustMatch as $key => $param) {
             $matchData[] = ["match" => [$key => $param]];
         }
 
-        foreach($mustNot as $key=>$param)
-        {
+        foreach ($mustNot as $key => $param) {
             $notMatchData[] = ["match" => [$key => $param]];
         }
 
@@ -159,7 +201,7 @@ class ElasticSearchQueries implements ElasticSearchQueriesInterface
             "query" => [
                 "bool" =>
                     [
-                        "must" => $matchData,
+                        "must"     => $matchData,
                         "must_not" => $notMatchData
                     ]
             ]

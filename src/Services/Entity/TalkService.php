@@ -100,8 +100,8 @@ final class TalkService implements TalkServiceInterface
     {
         $match = [
             "origin" => $user_id,
-            "transaction" => $transaction_id,
-            "status" => GeneralTypes::STATUS_ENABLE
+            "donation.id" => $transaction_id,
+            "read_at" => "NULL"
         ];
 
         $query = $this->elasticQueries->getBoolMustMatchBy($this->talkIndex, $match);
