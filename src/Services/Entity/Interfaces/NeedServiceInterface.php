@@ -35,4 +35,6 @@ interface NeedServiceInterface
     public function getDonationId(): ?string;
 
     public function getOneByIdOrFail(string $need_id): array;
+
+    public function getOneByDonor(string $need_id, string $user_id): array;
 }

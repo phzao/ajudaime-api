@@ -116,6 +116,26 @@ final class NeedService implements NeedServiceInterface
         $this->repository->update($needUpdated);
     }
 
+    public function getOneByDonor(string $need_id, string $user_id): array
+    {
+        $match = [
+            "donation.user.id" => $user_id,
+            "id" => $need_id
+        ];
+
+        $query = $this->elasticQueries->getBoolMustMatchBy($this->needIndex, $match);
+
+        $query["size"] = 1;
+
+        $res = $this->repository->search($query);
+
+        if (empty($res["results"])) {
+            throw new NotFoundHttpException("Lista não localizada");
+        }
+
+        return $res["results"][0];
+    }
+
     public function getOneByIdUserIdAndEnable(string $need_id, string $user_id): array
     {
         $match = [

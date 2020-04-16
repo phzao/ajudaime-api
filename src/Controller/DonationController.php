@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Services\Entity\Interfaces\DonationServiceInterface;
 use App\Services\Entity\Interfaces\NeedServiceInterface;
+use App\Services\Entity\Interfaces\UserServiceInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
@@ -106,6 +107,29 @@ class DonationController extends APIController
             $donation = $donationService->getDonationByIdAndUserOrFail($uuid, $user->getId());
 
             return $this->respondSuccess($donation);
+        } catch (NotFoundHttpException $exception) {
+
+            return $this->respondNotFoundError($exception->getMessage());
+        } catch (\Exception $exception) {
+
+            return $this->respondBadRequestError($exception->getMessage());
+        }
+    }
+
+    /**
+     * @Route("/api/v1/donations/{uuid}/needy", methods={"GET"})
+     */
+    public function getUserData($uuid,
+                                DonationServiceInterface $donationService,
+                                UserServiceInterface $userService)
+    {
+        try {
+            $user = $this->getUser();
+            $donation = $donationService->getDonationByIdAndUserOrFail($uuid, $user->getId());
+
+            $userNeedy = $userService->getUserById($donation["need"]["user"]["id"]);
+
+            return $this->respondSuccess($userNeedy);
         } catch (NotFoundHttpException $exception) {
 
             return $this->respondNotFoundError($exception->getMessage());
