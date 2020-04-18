@@ -390,6 +390,9 @@ class User implements UsuarioInterface, ModelInterface, SimpleTimeInterface
         return [
             "phone",
             "whatsapp",
+            "state",
+            "country",
+            "city",
             "message",
             "localization"
         ];
