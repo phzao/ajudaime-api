@@ -260,7 +260,10 @@ final class DonationService implements DonationServiceInterface
             "user.id" => $user_id,
             "need.user.id" => $user_id
         ];
+
         $query = $this->elasticQueries->getBoolMustOrShouldBy($this->donationIndex, $must, $should);
+
+        $query["body"]["query"]["bool"]["must_not"] = ["match" => ["status" => "canceled"]];
 
         $res = $this->repository->search($query);
 
