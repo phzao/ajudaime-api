@@ -58,6 +58,7 @@ class RegisterController extends APIController
                           LoginServiceInterface $loginService)
     {
         try {
+            return $this->respondSuccess([]);
             $data = $request->request->all();
             $user = $userService->getUserByEmailAnyway($data);
 
