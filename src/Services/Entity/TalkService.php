@@ -7,7 +7,6 @@ use App\Repository\ElasticSearch\ElasticSearchRepositoryInterface;
 use App\Services\Entity\Interfaces\TalkServiceInterface;
 use App\Services\Validation\ValidateModelInterface;
 use App\Utils\ElasticSearch\ElasticSearchQueriesInterface;
-use App\Utils\Enums\GeneralTypes;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
@@ -18,8 +17,6 @@ final class TalkService implements TalkServiceInterface
     private $elasticQueries;
 
     private $talk;
-
-    private $talkIndex;
 
     private $validation;
 
@@ -40,7 +37,7 @@ final class TalkService implements TalkServiceInterface
             $this->repository->index($mapping);
         }
 
-        $this->talkIndex = $talk_index["index"];
+        $this->elasticQueries->setIndex($talk_index["index"]);
     }
 
     public function setTalkRead(string $talk_id): array
@@ -57,7 +54,7 @@ final class TalkService implements TalkServiceInterface
     public function getTalkEntityByIdOrFail(string $talk_id): ?TalkInterface
     {
         $match = [
-            "index" => $this->talkIndex,
+            "index" => $this->talk->getIndexName(),
             "id" => $talk_id
         ];
 
@@ -104,7 +101,7 @@ final class TalkService implements TalkServiceInterface
             "read_at" => "NULL"
         ];
 
-        $query = $this->elasticQueries->getBoolMustMatchBy($this->talkIndex, $match);
+        $query = $this->elasticQueries->getBoolMustMatchBy($match);
         $query["size"] = $allowed_number;
 
         $talks = $this->repository->search($query);

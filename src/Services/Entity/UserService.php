@@ -32,8 +32,6 @@ final class UserService implements UserServiceInterface
 
     private $validationModel;
 
-    private $userIndex;
-
     /**
      * @throws \Exception
      */
@@ -55,7 +53,7 @@ final class UserService implements UserServiceInterface
             $this->repository->index($mapping);
         }
 
-        $this->userIndex = $user_index["index"];
+        $this->elasticQueries->setIndex($user_index["index"]);
     }
 
     /**
@@ -64,7 +62,7 @@ final class UserService implements UserServiceInterface
     public function getUserByEmailAnyway(array $data): ?array
     {
 
-        $query = $this->elasticQueries->getQueryExactBy($this->userIndex, "email", $data["email"]);
+        $query = $this->elasticQueries->getQueryExactBy("email", $data["email"]);
 
         $user = $this->repository->getOneBy($query);
 
@@ -104,7 +102,7 @@ final class UserService implements UserServiceInterface
     public function getUserById(string $id): array
     {
         $params = [
-            "index" => $this->userIndex,
+            "index" => $this->user->getIndexName(),
             "id" => $id
         ];
 

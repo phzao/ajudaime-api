@@ -19,8 +19,6 @@ final class DonationService implements DonationServiceInterface
 
     private $donation;
 
-    private $donationIndex;
-
     private $validation;
 
     private $donationToNeed;
@@ -42,7 +40,7 @@ final class DonationService implements DonationServiceInterface
             $this->repository->index($mapping);
         }
 
-        $this->donationIndex = $donation_index["index"];
+        $this->elasticQueries->setIndex($donation_index["index"]);
     }
 
     public function getDonationsListProcessingByUser(string $user_id, $result_quantity = 1): array
@@ -52,7 +50,7 @@ final class DonationService implements DonationServiceInterface
             "status" => GeneralTypes::STATUS_PROCESSING
         ];
 
-        $query = $this->elasticQueries->getBoolMustMatchBy($this->donationIndex, $match);
+        $query = $this->elasticQueries->getBoolMustMatchBy($match);
         $query["size"] = $result_quantity;
 
         return $this->repository->search($query);
@@ -90,7 +88,7 @@ final class DonationService implements DonationServiceInterface
             "status" => GeneralTypes::STATUS_PROCESSING
         ];
 
-        $query = $this->elasticQueries->getBoolMustMatchBy($this->donationIndex, $match);
+        $query = $this->elasticQueries->getBoolMustMatchBy($match);
         $query["size"] = 1;
 
         $res = $this->repository->search($query);
@@ -116,7 +114,7 @@ final class DonationService implements DonationServiceInterface
             "user.id" => $user_id
         ];
 
-        $query = $this->elasticQueries->getBoolMustMatchBy($this->donationIndex, $match);
+        $query = $this->elasticQueries->getBoolMustMatchBy($match);
         $query["size"] = 1;
 
         if (!empty($fields)) {
@@ -135,7 +133,7 @@ final class DonationService implements DonationServiceInterface
     public function getDonationEntityByIdOrFail(string $donation_id): ?DonationInterface
     {
         $match = [
-            "index" => $this->donationIndex,
+            "index" => $this->donation->getIndexName(),
             "id" => $donation_id
         ];
 
@@ -156,7 +154,8 @@ final class DonationService implements DonationServiceInterface
             "id" => $donation_id
         ];
 
-        $query = $this->elasticQueries->getBoolMustMatchBy($this->donationIndex, $match);
+        $this->elasticQueries->setIndex($this->donation->getIndexName());
+        $query = $this->elasticQueries->getBoolMustMatchBy($match);
         $query["size"] = 1;
 
         if (!empty($fields)) {
@@ -179,7 +178,7 @@ final class DonationService implements DonationServiceInterface
             "status" => GeneralTypes::STATUS_PROCESSING
         ];
 
-        $query = $this->elasticQueries->getBoolMustMatchBy($this->donationIndex, $match);
+        $query = $this->elasticQueries->getBoolMustMatchBy($match);
         $query["size"] = 1;
 
         if (!empty($fields)) {
@@ -209,7 +208,8 @@ final class DonationService implements DonationServiceInterface
             "need.user.id" => $user_id
         ];
 
-        $query = $this->elasticQueries->getBoolMustMatchBy($this->donationIndex, $match);
+        $this->elasticQueries->setIndex($this->donation->getIndexName());
+        $query = $this->elasticQueries->getBoolMustMatchBy($match);
         $query["size"] = 1;
 
         $res = $this->repository->search($query);
@@ -238,7 +238,8 @@ final class DonationService implements DonationServiceInterface
             "status" => GeneralTypes::STATUS_PROCESSING
         ];
 
-        $query = $this->elasticQueries->getBoolMustMatchBy($this->donationIndex, $match);
+        $this->elasticQueries->setIndex($this->donation->getIndexName());
+        $query = $this->elasticQueries->getBoolMustMatchBy($match);
         $query["size"] = 1;
 
         $res = $this->repository->search($query);
@@ -261,7 +262,7 @@ final class DonationService implements DonationServiceInterface
             "need.user.id" => $user_id
         ];
 
-        $query = $this->elasticQueries->getBoolMustOrShouldBy($this->donationIndex, $must, $should);
+        $query = $this->elasticQueries->getBoolMustOrShouldBy($must, $should);
 
         $query["body"]["query"]["bool"]["must_not"] = ["match" => ["status" => "canceled"]];
 
@@ -297,6 +298,7 @@ final class DonationService implements DonationServiceInterface
         $this->donation->cancel();
 
         $donationUpdated = $this->donation->getStatusUpdateToIndex();
+
         $this->repository->update($donationUpdated);
         $this->donationToNeed = $this->donation->getResumeToNeed();
 
@@ -327,7 +329,7 @@ final class DonationService implements DonationServiceInterface
             "user.id" => $user_id
         ];
 
-        $query = $this->elasticQueries->getBoolMustMatchBy($this->donationIndex, $match);
+        $query = $this->elasticQueries->getBoolMustMatchBy($match);
         $res = $this->repository->search($query);
 
         if (!empty($res["results"])) {
@@ -345,7 +347,7 @@ final class DonationService implements DonationServiceInterface
             "status" => $status
         ];
 
-        $query = $this->elasticQueries->getBoolMustMatchBy($this->donationIndex, $match);
+        $query = $this->elasticQueries->getBoolMustMatchBy($match);
         $res = $this->repository->search($query);
 
         if (!empty($res["results"])) {

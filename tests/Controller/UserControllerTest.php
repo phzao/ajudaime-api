@@ -224,7 +224,7 @@ lfajsdflajdfkl asldfajsldfjasldfjalks;djf lasjdfl;a sdjfla jsdlfkjaslkdf jaskldf
         $res = json_decode($this->client->getResponse()->getContent(), true);
 
         $userData = $res["data"];
-        $this->assertCount(12, $userData);
+        $this->assertCount(15, $userData);
         $this->assertEquals(null, $userData["name"]);
         $this->assertEquals("enable", $userData["status"]);
         $this->assertEquals(null, $userData["localization"]);
@@ -232,5 +232,8 @@ lfajsdflajdfkl asldfajsldfjasldfjalks;djf lasjdfl;a sdjfla jsdlfkjaslkdf jaskldf
         $this->assertEquals("NULL", $userData["phone"]);
         $this->assertEquals("NULL", $userData["whatsapp"]);
         $this->assertEquals("NULL", $userData["message"]);
+        $this->assertEquals(null, $userData["country"]);
+        $this->assertEquals(null, $userData["state"]);
+        $this->assertEquals(null, $userData["city"]);
     }
 }

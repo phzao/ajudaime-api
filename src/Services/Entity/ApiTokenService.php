@@ -21,8 +21,6 @@ final class ApiTokenService implements ApiTokenServiceInterface
 
     private $elasticQueries;
 
-    private $apiTokenIndex;
-
     public function __construct(ElasticSearchRepositoryInterface $elasticSearchRepository,
                                 ElasticSearchQueriesInterface $elasticSearchQueries,
                                 ApiTokenInterface $apiToken,
@@ -40,7 +38,7 @@ final class ApiTokenService implements ApiTokenServiceInterface
             $this->repository->index($mapping);
         }
 
-        $this->apiTokenIndex = $apiTokenIndex["index"];
+        $this->elasticQueries->setIndex($apiTokenIndex["index"]);
     }
 
     /**
@@ -70,7 +68,7 @@ final class ApiTokenService implements ApiTokenServiceInterface
         ];
 
         $query = $this->elasticQueries
-                      ->getBoolMustMatchBy($this->apiTokenIndex, $params);
+                      ->getBoolMustMatchBy($params);
 
         return $this->repository->getOneBy($query);
     }
@@ -82,8 +80,9 @@ final class ApiTokenService implements ApiTokenServiceInterface
             "expired_at" => 'NULL'
         ];
 
-        $query = $this->elasticQueries
-                      ->getBoolMustMatchBy($this->apiTokenIndex, $params);
+        $this->elasticQueries->setIndex($this->apiToken->getIndexName());
+
+        $query = $this->elasticQueries->getBoolMustMatchBy($params);
 
         return $this->repository->getOneBy($query);
     }

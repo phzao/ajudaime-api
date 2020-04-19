@@ -74,6 +74,7 @@ class NeedController extends APIController
         try {
             $user = $this->getUser();
             $needService->remove($uuid, $user->getId());
+
             $donation_id = $needService->getDonationId();
 
             $donationService->cancelDonationById($donation_id);

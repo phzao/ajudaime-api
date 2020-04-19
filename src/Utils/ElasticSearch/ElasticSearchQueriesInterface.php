@@ -7,21 +7,21 @@ namespace App\Utils\ElasticSearch;
  */
 interface ElasticSearchQueriesInterface
 {
-    public function getQueryExactBy(string $index, string $column, string $value): array;
+    public function getQueryExactBy(string $column, string $value): array;
 
-    public function getQueryToSingleSearch(string $index, string $query, string $field): array;
+    public function getQueryToSingleSearch(string $query, string $field): array;
 
-    public function getMatchSearch(string $index, array $params): array;
+    public function getMatchSearch(array $params): array;
 
-    public function getBodyData(string $index): array;
+    public function getBodyData(): array;
 
-    public function getBoolMustMatchBy(string $index, array $params): array;
+    public function getBoolMustMatchBy(array $params): array;
 
-    public function getBoolMustNotMatchBy(string $index, array $params): array;
+    public function getBoolMustNotMatchBy(array $params): array;
 
-    public function getBoolMustOrShouldBy(string $index, array $must, array $should): array;
+    public function getBoolMustOrShouldBy(array $must, array $should): array;
 
-    public function getBoolMustMatchMustNotBy(string $index, array $mustMatch, array $mustNot): array;
+    public function getBoolMustMatchMustNotBy(array $mustMatch, array $mustNot): array;
 
     public function setIndex(string $index): void;
 

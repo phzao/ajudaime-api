@@ -21,8 +21,6 @@ final class NeedService implements NeedServiceInterface
 
     private $need;
 
-    private $needIndex;
-
     private $validation;
 
     private $donation;
@@ -44,7 +42,6 @@ final class NeedService implements NeedServiceInterface
         }
 
         $this->elasticQueries->setIndex($need_index["index"]);
-        $this->needIndex = $need_index["index"];
     }
 
     public function register(array $data): ?array
@@ -86,7 +83,7 @@ final class NeedService implements NeedServiceInterface
     public function getNeedByIdOrFail(string $need_id): array
     {
         $match = [
-            "index" => $this->needIndex,
+            "index" => $this->need->getIndexName(),
             "id" => $need_id
         ];
 
@@ -123,7 +120,7 @@ final class NeedService implements NeedServiceInterface
             "id" => $need_id
         ];
 
-        $query = $this->elasticQueries->getBoolMustMatchBy($this->needIndex, $match);
+        $query = $this->elasticQueries->getBoolMustMatchBy($match);
 
         $query["size"] = 1;
 
@@ -144,7 +141,7 @@ final class NeedService implements NeedServiceInterface
             "status" => GeneralTypes::STATUS_ENABLE
         ];
 
-        $query = $this->elasticQueries->getBoolMustMatchBy($this->needIndex, $match);
+        $query = $this->elasticQueries->getBoolMustMatchBy($match);
 
         $query["size"] = 1;
 
@@ -165,7 +162,8 @@ final class NeedService implements NeedServiceInterface
             "status" => GeneralTypes::STATUS_ENABLE
         ];
 
-        $query = $this->elasticQueries->getBoolMustMatchBy($this->needIndex, $match);
+        $this->elasticQueries->setIndex($this->need->getIndexName());
+        $query = $this->elasticQueries->getBoolMustMatchBy($match);
 
         $query["size"] = 1;
 
@@ -176,7 +174,7 @@ final class NeedService implements NeedServiceInterface
         }
 
         $match = [
-            "index" => $this->needIndex,
+            "index" => $this->need->getIndexName(),
             "id" => $need_id
         ];
 
@@ -216,7 +214,7 @@ final class NeedService implements NeedServiceInterface
             "user.id" => $user_id
         ];
 
-        $query = $this->elasticQueries->getBoolMustMatchBy($this->needIndex, $match);
+        $query = $this->elasticQueries->getBoolMustMatchBy($match);
         $res = $this->repository->search($query);
 
         if (empty($res["results"])) {
@@ -232,7 +230,7 @@ final class NeedService implements NeedServiceInterface
             "user.id" => $user_id
         ];
 
-        $query = $this->elasticQueries->getBoolMustMatchBy($this->needIndex, $match);
+        $query = $this->elasticQueries->getBoolMustMatchBy($match);
         $res = $this->repository->search($query);
 
         if (!empty($res["results"])) {
@@ -245,7 +243,7 @@ final class NeedService implements NeedServiceInterface
     public function getOneByIdOrFail(string $id): array
     {
         $params = [
-            "index" => $this->needIndex,
+            "index" => $this->need->getIndexName(),
             "id" => $id
         ];
 
@@ -267,12 +265,13 @@ final class NeedService implements NeedServiceInterface
 
     public function getOneByIdAndEnableOrFail(string $need_id): array
     {
+        $this->elasticQueries->setIndex($this->need->getIndexName());;
         $match = [
             "id" => $need_id,
             "status" => GeneralTypes::STATUS_ENABLE
         ];
 
-        $query = $this->elasticQueries->getBoolMustMatchBy($this->needIndex, $match);
+        $query = $this->elasticQueries->getBoolMustMatchBy($match);
 
         $query["size"] = 1;
 
@@ -291,7 +290,7 @@ final class NeedService implements NeedServiceInterface
             "status" => GeneralTypes::STATUS_ENABLE
         ];
 
-        $query = $this->elasticQueries->getBoolMustMatchBy($this->needIndex, $match);
+        $query = $this->elasticQueries->getBoolMustMatchBy($match);
 
         $res = $this->repository->search($query);
 
@@ -309,7 +308,7 @@ final class NeedService implements NeedServiceInterface
             "user.country" => $data["country"],
         ];
 
-        $query = $this->elasticQueries->getBoolMustMatchBy($this->needIndex, $match);
+        $query = $this->elasticQueries->getBoolMustMatchBy($match);
 
         $res = $this->repository->search($query);
 
