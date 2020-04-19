@@ -101,6 +101,7 @@ final class TalkService implements TalkServiceInterface
             "read_at" => "NULL"
         ];
 
+        $this->elasticQueries->setIndex($this->talk->getIndexName());
         $query = $this->elasticQueries->getBoolMustMatchBy($match);
         $query["size"] = $allowed_number;
 

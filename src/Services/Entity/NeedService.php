@@ -230,6 +230,7 @@ final class NeedService implements NeedServiceInterface
             "user.id" => $user_id
         ];
 
+        $this->elasticQueries->setIndex($this->need->getIndexName());
         $query = $this->elasticQueries->getBoolMustMatchBy($match);
         $res = $this->repository->search($query);
 

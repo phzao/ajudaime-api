@@ -67,8 +67,9 @@ final class ApiTokenService implements ApiTokenServiceInterface
             "expired_at" => 'NULL'
         ];
 
-        $query = $this->elasticQueries
-                      ->getBoolMustMatchBy($params);
+        $this->elasticQueries->setIndex($this->apiToken->getIndexName());
+
+        $query = $this->elasticQueries->getBoolMustMatchBy($params);
 
         return $this->repository->getOneBy($query);
     }
@@ -81,7 +82,6 @@ final class ApiTokenService implements ApiTokenServiceInterface
         ];
 
         $this->elasticQueries->setIndex($this->apiToken->getIndexName());
-
         $query = $this->elasticQueries->getBoolMustMatchBy($params);
 
         return $this->repository->getOneBy($query);
