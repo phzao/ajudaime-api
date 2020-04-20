@@ -259,6 +259,7 @@ final class NeedService implements NeedServiceInterface
     public function updateAnyway(array $need)
     {
         $this->need->setAttributes($need);
+        $this->need->updated();
         $needUpdated = $this->need->getFullDataToUpdateIndex();
 
         $this->repository->update($needUpdated);
