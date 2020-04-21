@@ -5,6 +5,7 @@ namespace App\Services\Entity;
 use App\Entity\Interfaces\DonationInterface;
 use App\Repository\ElasticSearch\ElasticSearchRepositoryInterface;
 use App\Services\Entity\Interfaces\DonationServiceInterface;
+use App\Services\Entity\Interfaces\NeedServiceInterface;
 use App\Services\Validation\ValidateModelInterface;
 use App\Utils\ElasticSearch\ElasticSearchQueriesInterface;
 use App\Utils\Enums\GeneralTypes;
@@ -306,10 +307,10 @@ final class DonationService implements DonationServiceInterface
         return $this->donation->getNeedId();
     }
 
-    public function cancelDonationById($donation_id): array
+    public function cancelDonationById($donation_id): string
     {
         if (empty($donation_id)) {
-            return [];
+            return '';
         }
 
         $donationSaved = $this->getDonationByIdOrFail($donation_id);
@@ -321,7 +322,7 @@ final class DonationService implements DonationServiceInterface
 
         $this->repository->update($donationUpdated);
 
-        return $this->donation->getResumeToNeed();
+        return $this->donation->getNeedId();
     }
 
     public function getDonationsByUser(string $user_id): array
@@ -370,5 +371,31 @@ final class DonationService implements DonationServiceInterface
         $donation->updateTalk($talk);
         $donationUpdated = $donation->getFullDataToUpdateIndex();
         $this->repository->update($donationUpdated);
+    }
+
+    public function cancelWithMoreThanTwoDaysProcessing(string $dateToCheck,
+                                                        NeedServiceInterface $needService):void
+    {
+        $this->elasticQueries->setIndex($this->donation->getIndexName());
+        $query = $this->elasticQueries->getMustAndOldestDateBy(["status" => "processing"],
+                                                               "created_at",
+                                                               $dateToCheck);
+
+        $res = $this->repository->search($query);
+
+        if (!empty($res["results"])) {
+            foreach($res["results"] as $donation)
+            {
+                $this->donation->setAttributes($donation);
+                $this->donation->cancel();
+
+                $donationUpdated = $this->donation->getStatusUpdateToIndex();
+
+                $this->repository->update($donationUpdated);
+
+                $needId = $this->donation->getNeedId();
+                $needService->removeDonationCanceled($needId);
+            }
+        }
     }
 }

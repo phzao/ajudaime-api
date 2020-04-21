@@ -263,4 +263,32 @@ class DonationController extends APIController
             return $this->respondBadRequestError($exception->getMessage());
         }
     }
+
+    /**
+     * @Route("/public/donations/oldest/{token}", methods={"PUT"})
+     */
+    public function cancelOldestDonations($token,
+                                          NeedServiceInterface $needService,
+                                          DonationServiceInterface $donationService)
+    {
+        try {
+            if ($_ENV["TOKEN_CHECK"]!==$token) {
+                return $this->respondForbiddenFail("token de checagem invalido");
+            }
+
+            $created_at = new \DateTime();
+            $created_at->sub(new \DateInterval('P5D'));
+            $created_at = $created_at->format('Y-m-d\TH:m:s') ;
+
+            $donationService->cancelWithMoreThanTwoDaysProcessing($created_at, $needService);
+
+            return $this->respondUpdatedResource();
+        } catch (NotFoundHttpException $exception) {
+
+            return $this->respondNotFoundError($exception->getMessage());
+        } catch (\Exception $exception) {
+
+            return $this->respondBadRequestError($exception->getMessage());
+        }
+    }
 }

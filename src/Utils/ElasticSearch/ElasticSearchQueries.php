@@ -87,6 +87,32 @@ class ElasticSearchQueries implements ElasticSearchQueriesInterface
         return $body;
     }
 
+    public function getMustAndOldestDateBy(array $must, string $field_date, string $field_value): array
+    {
+        $matchData = [];
+
+        foreach ($must as $key => $param) {
+            $matchData[] = ["match" => [$key => $param]];
+        }
+
+        $body = $this->getBodyData();
+
+        $matchData[] = [
+            "range" => [
+                "created_at" => ["lte" => $field_value]
+            ]
+        ];
+
+        $body["body"] = [
+            "query" => [
+                "bool" =>
+                    ["must" => $matchData]
+            ]
+        ];
+
+        return $body;
+    }
+
     public function getBoolMustNotMatchBy(array $params): array
     {
         $matchData = [];

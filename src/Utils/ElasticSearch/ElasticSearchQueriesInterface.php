@@ -27,4 +27,5 @@ interface ElasticSearchQueriesInterface
 
     public function getMustAndMustNotExist(array $must, string $exist_field, array $should): array;
 
+    public function getMustAndOldestDateBy(array $must, string $field_date, string $field_value): array;
 }

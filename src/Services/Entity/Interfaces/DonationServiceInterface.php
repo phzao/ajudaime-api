@@ -20,7 +20,7 @@ interface DonationServiceInterface
 
     public function cancelDonation(string $user_id, $donation_id): string;
 
-    public function cancelDonationById($donation_id): array;
+    public function cancelDonationById($donation_id): string;
 
     public function doneDonation(string $user_id, string $donation_id): string;
 
@@ -45,4 +45,7 @@ interface DonationServiceInterface
     public function update(array $donation): void;
 
     public function updateTalk(array $talk): void;
+
+    public function cancelWithMoreThanTwoDaysProcessing(string $dateToCheck,
+                                                        NeedServiceInterface $needService):void;
 }
