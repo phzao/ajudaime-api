@@ -115,7 +115,11 @@ class Donation implements DonationInterface
             'id'    => $this->id,
             'type'  => '_doc',
             'body'  => [
-                "doc" => ["status" => $this->status]
+                "doc" => [
+                    "status" => $this->status,
+                    "canceled_at" => $this->canceled_at,
+                    "updated_at" => $this->updated_at
+                ]
             ]
         ];
     }
@@ -154,11 +158,20 @@ class Donation implements DonationInterface
                             ]
                         ],
                         "status" => ["type" => "text"],
-                        "created_at" => ["type" => "date"],
+                        "created_at" => [
+                            "type" => "date",
+                            "format"=> "yyyy-MM-dd HH:mm:ss"
+                        ],
                         "updated_at" => ["type" => "date", "null_value" => "NULL"],
-                        "canceled_at" => ["type" => "date", "null_value" => "NULL"],
-                        "done_at" => ["type" => "date", "null_value" => "NULL"],
-                        "need_confirmed_at" => ["type" => "date", "null_value" => "NULL"]
+                        "canceled_at" => ["type" => "date",
+                                          "format"=> "yyyy-MM-dd HH:mm:ss",
+                                          "null_value" => "NULL"],
+                        "done_at" => ["type" => "date",
+                                      "format"=> "yyyy-MM-dd HH:mm:ss",
+                                      "null_value" => "NULL"],
+                        "need_confirmed_at" => ["type" => "date",
+                                                "format"=> "yyyy-MM-dd HH:mm:ss",
+                                                "null_value" => "NULL"]
                     ]
                 ]
             ]

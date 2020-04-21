@@ -277,8 +277,8 @@ class DonationController extends APIController
             }
 
             $created_at = new \DateTime();
-            $created_at->sub(new \DateInterval('P5D'));
-            $created_at = $created_at->format('Y-m-d\TH:m:s') ;
+            $created_at->sub(new \DateInterval('P2D'));
+            $created_at = $created_at->format('Y-m-d H:m:s');
 
             $donationService->cancelWithMoreThanTwoDaysProcessing($created_at, $needService);
 

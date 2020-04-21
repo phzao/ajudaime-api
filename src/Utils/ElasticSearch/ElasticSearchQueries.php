@@ -87,7 +87,7 @@ class ElasticSearchQueries implements ElasticSearchQueriesInterface
         return $body;
     }
 
-    public function getMustAndOldestDateBy(array $must, string $field_date, string $field_value): array
+    public function getMustAndOlderDateBy(array $must, string $field_date, string $field_value): array
     {
         $matchData = [];
 

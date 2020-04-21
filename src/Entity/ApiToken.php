@@ -129,10 +129,11 @@ class ApiToken implements ApiTokenInterface
                     "properties" => [
                         "token" => ["type" => "text"],
                         "user" => ["type" => "keyword"],
-                        "created_at" => ["type" => "date"],
-                        "expire_at" => ["type" => "date"],
+                        "created_at" => ["type" => "date", "format"=> "yyyy-MM-dd HH:mm:ss"],
+                        "expire_at" => ["type" => "date", "format"=> "yyyy-MM-dd HH:mm:ss"],
                         "expired_at" => [
                             "type" => "date",
+                            "format"=> "yyyy-MM-dd HH:mm:ss",
                             "null_value" => "NULL"
                         ],
                         "device_type" => ["type" => "text"],

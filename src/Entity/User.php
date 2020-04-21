@@ -335,9 +335,9 @@ class User implements UsuarioInterface, ModelInterface, SimpleTimeInterface
                                 ]
                             ]
                         ],
-                        "created_at" => ["type" => "date"],
-                        "updated_at" => ["type" => "date", "null_value" => "NULL"],
-                        "deleted_at" => ["type" => "date", "null_value" => "NULL"]
+                        "created_at" => ["type" => "date", "format"=> "yyyy-MM-dd HH:mm:ss"],
+                        "updated_at" => ["type" => "date", "null_value" => "NULL", "format"=> "yyyy-MM-dd HH:mm:ss"],
+                        "deleted_at" => ["type" => "date", "null_value" => "NULL", "format"=> "yyyy-MM-dd HH:mm:ss"]
                     ]
                 ]
             ]

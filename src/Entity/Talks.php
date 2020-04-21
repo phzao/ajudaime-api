@@ -132,8 +132,8 @@ class Talks implements TalkInterface
                         "donation" => ["type" => "keyword"],
                         "status" => ["type" => "text"],
                         "message" => ["type" => "text", "null_value" => "NULL"],
-                        "created_at" => ["type" => "date"],
-                        "read_at" => ["type" => "date", "null_value" => "NULL"]
+                        "created_at" => ["type" => "date", "format"=> "yyyy-MM-dd HH:mm:ss"],
+                        "read_at" => ["type" => "date", "format"=> "yyyy-MM-dd HH:mm:ss", "null_value" => "NULL"]
                     ]
                 ]
             ]

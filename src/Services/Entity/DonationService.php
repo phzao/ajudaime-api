@@ -377,19 +377,21 @@ final class DonationService implements DonationServiceInterface
                                                         NeedServiceInterface $needService):void
     {
         $this->elasticQueries->setIndex($this->donation->getIndexName());
-        $query = $this->elasticQueries->getMustAndOldestDateBy(["status" => "processing"],
+
+        $query = $this->elasticQueries->getMustAndOlderDateBy(["status" => "processing"],
                                                                "created_at",
                                                                $dateToCheck);
 
         $res = $this->repository->search($query);
 
         if (!empty($res["results"])) {
+            dump($dateToCheck, $res["results"]);exit;
             foreach($res["results"] as $donation)
             {
                 $this->donation->setAttributes($donation);
                 $this->donation->cancel();
 
-                $donationUpdated = $this->donation->getStatusUpdateToIndex();
+                $donationUpdated = $this->donation->getFullDataToUpdateIndex();
 
                 $this->repository->update($donationUpdated);
 

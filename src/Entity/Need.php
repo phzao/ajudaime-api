@@ -152,7 +152,7 @@ class Need implements NeedInterface
                         "needsList" => ["type" => "text"],
                         "message" => ["type" => "text"],
                         "status" => ["type" => "text"],
-                        "created_at" => ["type" => "date"],
+                        "created_at" => ["type" => "date", "format"=> "yyyy-MM-dd HH:mm:ss"],
                         "updated_at" => ["type" => "date", "null_value" => "NULL"],
                     ]
                 ]
