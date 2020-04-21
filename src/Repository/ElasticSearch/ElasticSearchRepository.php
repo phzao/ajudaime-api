@@ -22,7 +22,7 @@ class ElasticSearchRepository implements ElasticSearchRepositoryInterface
         $this->url = $_ENV["ELASTICSEARCH_HOST"];
 
         try {
-            $this->clientBuilder = ClientBuilder::create()
+            $this->clientBuilder = ClientBuilder::create()->setBasicAuthentication($_ENV["ELASTICSEARCH_USER"], $_ENV["ELASTICSEARCH_PASS"])
                 ->setHosts([$this->url])
                 ->build();
 
