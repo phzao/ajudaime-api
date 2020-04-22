@@ -116,9 +116,23 @@ class Donation implements DonationInterface
             'type'  => '_doc',
             'body'  => [
                 "doc" => [
+                    "status" => $this->status
+                ]
+            ]
+        ];
+    }
+
+    public function getStatusAndCanceledToIndex(): array
+    {
+        $this->updated();
+        return [
+            'index' => $this->getIndexName(),
+            'id'    => $this->id,
+            'type'  => '_doc',
+            'body'  => [
+                "doc" => [
                     "status" => $this->status,
-                    "canceled_at" => $this->canceled_at,
-                    "updated_at" => $this->updated_at
+                    "canceled_at" => $this->canceled_at
                 ]
             ]
         ];

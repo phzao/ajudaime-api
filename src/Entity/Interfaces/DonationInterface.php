@@ -21,4 +21,6 @@ interface DonationInterface extends ModelInterface
     public function addTalk(array $talk): void;
 
     public function updateTalk(array $talk): void;
+
+    public function getStatusAndCanceledToIndex(): array;
 }

@@ -299,7 +299,7 @@ final class DonationService implements DonationServiceInterface
         $this->donation->setAttributes($donationSaved);
         $this->donation->cancel();
 
-        $donationUpdated = $this->donation->getStatusUpdateToIndex();
+        $donationUpdated = $this->donation->getFullDataToUpdateIndex();
 
         $this->repository->update($donationUpdated);
         $this->donationToNeed = $this->donation->getResumeToNeed();

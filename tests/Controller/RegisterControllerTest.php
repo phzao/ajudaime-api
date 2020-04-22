@@ -30,6 +30,7 @@ class RegisterControllerTest extends WebTestCase
 
     public function tearDown(): void
     {
+        parent::tearDown();
         $this->clearIndexes();
     }
 
@@ -54,8 +55,23 @@ class RegisterControllerTest extends WebTestCase
 
         $res = json_decode($this->client->getResponse()->getContent(), true);
         $this->assertCount(6, $res["data"]);
-        $this->assertCount(12, $res["data"]["user"]);
-        $userData = ["id", "email", "name", "status", "localization", "isConfirmedLocalization", "phone", "whatsapp", "message", "created_at", "updated_at", "deleted_at"];
+        $this->assertCount(15, $res["data"]["user"]);
+        $userData = [
+            "id",
+            "email",
+            "name",
+            "status",
+            "localization",
+            "isConfirmedLocalization",
+            "phone",
+            "city",
+            "country",
+            "state",
+            "whatsapp",
+            "message",
+            "created_at",
+            "updated_at",
+            "deleted_at"];
         $resultUserKeys = array_keys($res["data"]["user"]);
         $this->assertEquals($userData, $resultUserKeys);
     }
